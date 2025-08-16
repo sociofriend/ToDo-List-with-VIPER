@@ -8,10 +8,10 @@
 
 import Foundation
 
-protocol TodoProtocol: Codable, Identifiable {
+protocol TodoProtocol: Codable, Identifiable, Hashable {
     var id: Int { get }
+    var title: String? { get }
     var todo: String { get }
-    var description: String? { get }
     var completed: Bool { get }
     var userId: Int { get }
     var date: Date? { get }
@@ -19,8 +19,8 @@ protocol TodoProtocol: Codable, Identifiable {
 
 struct TodoDTO: TodoProtocol {
     let id: Int
+    var title: String? = nil
     let todo: String
-    var description: String? = nil
     let completed: Bool
     let userId: Int
     var date: Date? = nil
