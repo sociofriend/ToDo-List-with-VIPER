@@ -97,8 +97,31 @@ struct TaskListView<Task: TodoProtocol, Response: ResponseProtocol>: View {
                         }
                     }
                 }
+                
+                ZStack {
+                    
+                    Text(String("\(presenter.tasks.count) задач"))
+                        .frame(width: UIScreen.main.bounds.width / 3)
+                        .multilineTextAlignment(.center)
+                    
+                    HStack {
+                        Spacer()
+                        Button {
+                            
+                        } label: {
+                            Image(systemName: "square.and.pencil")
+                                .resizable()
+                                .frame(width: 28, height: 28)
+                                .foregroundStyle(.accent)
+                        }
+                    }
+                }
+                .frame(height: 49)
+                .padding()
             }
         }
+        .navigationTitle("Задачи")
+        
     }
     
     private func toggleRecording() {
