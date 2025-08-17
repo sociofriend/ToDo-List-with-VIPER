@@ -7,63 +7,17 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "F8313549-E65A-43BC-9CBB-8596AB591604"
+            uuid = "4B231B90-B35B-40A3-9009-C72C2FD57DEE"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "ToDO List/VIPER/Interactors/TaskListInteractorProtocol.swift"
+            filePath = "ToDO List/VIPER/Views/TaskListView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "53"
-            endingLineNumber = "53"
-            landmarkName = "fetchTasksFromCoreData()"
-            landmarkType = "7">
-            <Locations>
-               <Location
-                  uuid = "F8313549-E65A-43BC-9CBB-8596AB591604 - 23853bd24b77261e"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "closure #1 @Sendable () throws -&gt; Swift.Array&lt;ToDO_List.TodoDTO&gt; in ToDO_List.TaskListInteractor.fetchTasksFromCoreData() async throws -&gt; Swift.Array&lt;ToDO_List.TodoDTO&gt;"
-                  moduleName = "ToDO List.debug.dylib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/sociofriend/Desktop/ToDO%20List/ToDO%20List/VIPER/Interactors/TaskListInteractorProtocol.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "53"
-                  endingLineNumber = "53">
-               </Location>
-               <Location
-                  uuid = "F8313549-E65A-43BC-9CBB-8596AB591604 - 23853bd24b77261e"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "closure #1 @Sendable () throws -&gt; Swift.Array&lt;ToDO_List.TodoDTO&gt; in ToDO_List.TaskListInteractor.fetchTasksFromCoreData() async throws -&gt; Swift.Array&lt;ToDO_List.TodoDTO&gt;"
-                  moduleName = "ToDO List.debug.dylib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/sociofriend/Desktop/ToDO%20List/ToDO%20List/VIPER/Interactors/TaskListInteractorProtocol.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "53"
-                  endingLineNumber = "53">
-               </Location>
-            </Locations>
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "4125D239-B971-42CC-AC1E-07E5C3C57534"
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "ToDO List/VIPER/Interactors/TaskListInteractorProtocol.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "44"
-            endingLineNumber = "44"
-            landmarkName = "fetchTasks()"
-            landmarkType = "7">
+            startingLineNumber = "278"
+            endingLineNumber = "278"
+            landmarkName = "unknown"
+            landmarkType = "0">
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

@@ -10,29 +10,45 @@
 import Foundation
 internal import CoreData
 
-struct DataImporter<Task: TodoProtocol, response: ResponseProtocol> {
+struct DataImporter<Task: TodoProtocol, Response: ResponseProtocol> where Response.Task == Task {
+    
     static func importJSON(context: NSManagedObjectContext) {
         guard let url = Bundle.main.url(forResource: "todos", withExtension: "json"),
               let data = try? Data(contentsOf: url),
-              let response = try? JSONDecoder().decode(response.self, from: data) else {
+              let response = try? JSONDecoder().decode(Response.self, from: data) else {
             return
         }
         
-        
         for task in response.todos {
-            let entity = ToDoEntity(context: context)
+            // Check if entity exists (by ID for example)
+            let fetchRequest: NSFetchRequest<ToDoEntity> = ToDoEntity.fetchRequest()
+            fetchRequest.predicate = NSPredicate(format: "id == %d", task.id)
+            fetchRequest.fetchLimit = 1
+            
+            let existing = try? context.fetch(fetchRequest).first
+            
+            let entity: ToDoEntity
+            if let existing = existing {
+                // Update existing entity
+                entity = existing
+            } else {
+                // Insert new entity
+                entity = ToDoEntity(context: context)
+            }
+            
+            // Update fields
             entity.id = task.id
             entity.todo = task.todo
+            entity.title = task.title
             entity.completed = task.completed
             entity.userId = task.userId
+            entity.date = task.date
         }
-
+        
         do {
             try context.save()
         } catch {
-            //TODO: implement error handling
-            print("Failed to save: \(error)")
+            print("❌ Failed to save: \(error)")
         }
     }
 }
-
