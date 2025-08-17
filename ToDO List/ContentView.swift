@@ -6,11 +6,15 @@
 //
 
 import SwiftUI
-import CoreData
 
 struct ContentView: View {
+    @Environment(\.managedObjectContext) private var context
+    
     var body: some View {
         TaskListRouter<TodoDTO, ResponseDTO>.createModule()
+            .onAppear {
+                DataImporter<TodoDTO, ResponseDTO>.importJSON(context: context)
+            }
     }
 }
 

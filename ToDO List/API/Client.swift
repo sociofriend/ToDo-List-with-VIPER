@@ -11,6 +11,7 @@ protocol APIClientProtocol {
     associatedtype ResponseDTO: ResponseProtocol
     func fetchResponse() async throws -> ResponseDTO
 }
+
 final class Client<ResponseDTO: ResponseProtocol> {
     
     static func fetchResponse() async throws -> ResponseDTO {

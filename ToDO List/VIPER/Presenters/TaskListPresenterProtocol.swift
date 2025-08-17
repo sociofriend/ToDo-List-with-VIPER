@@ -17,6 +17,8 @@ protocol TaskListPresenterProtocol: ObservableObject {
 
 
 final class TaskListPresenter<Task, Response>: ObservableObject, TaskListPresenterProtocol where Task: TodoProtocol, Response: ResponseProtocol {
+    @Environment(\.managedObjectContext) private var context
+
     @Published var tasks: [Task] = []
     var interactor: any TaskListInteractorProtocol
     var router: (any TaskListRouterProtocol)?
