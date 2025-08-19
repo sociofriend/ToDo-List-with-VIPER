@@ -16,6 +16,7 @@ struct DataImporter<Task: TodoProtocol, Response: ResponseProtocol> where Respon
         guard let url = Bundle.main.url(forResource: "todos", withExtension: "json"),
               let data = try? Data(contentsOf: url),
               let response = try? JSONDecoder().decode(Response.self, from: data) else {
+            print("url not found")
             return
         }
         
@@ -51,4 +52,4 @@ struct DataImporter<Task: TodoProtocol, Response: ResponseProtocol> where Respon
             print("❌ Failed to save: \(error)")
         }
     }
-}
+} 

@@ -11,14 +11,14 @@ import Foundation
 
 protocol ResponseProtocol: Codable {
     associatedtype Task: TodoProtocol
-    var todos: [Task] { get }
-    var total: Int { get }
-    var skip: Int { get }
-    var limit: Int { get }
+    var todos: [Task] { get set }
+    var total: Int { get set }
+    var skip: Int { get set }
+    var limit: Int { get set }
 }
 
 // MARK: - Welcome
 struct ResponseDTO: ResponseProtocol {
-    let todos: [TodoDTO]
-    let total, skip, limit: Int
+    var todos: [TodoDTO]
+    var total, skip, limit: Int
 }

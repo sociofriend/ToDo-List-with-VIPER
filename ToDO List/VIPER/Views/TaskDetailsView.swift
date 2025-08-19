@@ -11,16 +11,27 @@ struct TaskDetailsView<Task: TodoProtocol>: View {
     
     @Binding var task: Task
     
+    private var titleBinding: Binding<String> {
+        Binding(
+            get: { task.title ?? "" },
+            set: { task.title = $0 }
+        )
+    }
+    
     var dateString: String {
         let formatter = DateFormatter()
         formatter.dateFormat = "dd/MM/yyyy"
-        return formatter.string(from: task.date)
+        if let date = task.date {
+            return formatter.string(from: date)
+        } else {
+            return "No date"
+        }
     }
     
     var body: some View {
         VStack(alignment: .leading) {
             
-            TextField("Title..", text: $task.title)
+            TextField("Title..", text: titleBinding)
             .font(.system(size: 34, weight: .bold))
             .multilineTextAlignment(.leading)
             .padding(.vertical, 4)
@@ -42,3 +53,4 @@ struct TaskDetailsView<Task: TodoProtocol>: View {
     @State var sampleTask = TodoDTO(id: 87, todo: "Todo title", completed: false, userId: 99)
     return TaskDetailsView<TodoDTO>(task: $sampleTask)
 }
+

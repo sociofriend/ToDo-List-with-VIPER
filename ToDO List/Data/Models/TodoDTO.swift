@@ -10,11 +10,11 @@ import Foundation
 
 protocol TodoProtocol: Codable, Identifiable, Hashable {
     var id: Int64 { get }
-    var title: String { get set }
+    var title: String? { get set }
     var todo: String { get set }
     var completed: Bool { get set }
     var userId: Int64 { get }
-    var date: Date { get set }
+    var date: Date? { get set }
 
     init(id: Int64, title: String?, todo: String, completed: Bool, userId: Int64, date: Date?)
 }
@@ -22,11 +22,11 @@ protocol TodoProtocol: Codable, Identifiable, Hashable {
 struct TodoDTO: TodoProtocol {
     
     let id: Int64
-    var title: String
+    var title: String?
     var todo: String
     var completed: Bool
     let userId: Int64
-    var date: Date
+    var date: Date?
     
     init(id: Int64, title: String? = nil, todo: String, completed: Bool, userId: Int64, date: Date? = nil) {
         self.id = id
