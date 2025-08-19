@@ -19,7 +19,7 @@ struct TaskListView<Task: TodoProtocol, Response: ResponseProtocol>: View {
         let base = searchInput.isEmpty
         ? presenter.tasks
         : presenter.tasks.filter {
-            ($0.title?.localizedCaseInsensitiveContains(searchInput) ?? false) ||
+            ($0.title.localizedCaseInsensitiveContains(searchInput)) ||
             $0.todo.localizedCaseInsensitiveContains(searchInput)
         }
         
@@ -39,16 +39,7 @@ struct TaskListView<Task: TodoProtocol, Response: ResponseProtocol>: View {
             .navigationTitle("Задачи")
         }
         
-    }
-    
-    private func toggleRecording() {
-        if speechHelper.isRecording {
-            speechHelper.stopRecording()
-        } else {
-            speechHelper.startRecording()
-        }
-    }
-    
+    }    
 }
 
 
@@ -273,8 +264,8 @@ extension TaskListView {
     private func preview(_ task: Task) -> some View {
         VStack(alignment: .leading, spacing: 4) {
             
-            if let title = task.title, !title.isEmpty {
-                Text(title)
+            if !task.title.isEmpty {
+                Text(task.title)
                     .font(.system(size: 16))
                     .strikethrough(task.completed)
                     .fontWeight(.medium)
@@ -282,16 +273,16 @@ extension TaskListView {
             
             Text(task.todo)
                 .font(.system(size: 12))
-                .strikethrough((task.title == nil || task.title?.isEmpty == true) && task.completed)
+                .strikethrough((task.title.isEmpty == true) && task.completed)
                 .fontWeight(.regular)
             
-            if let description = task.title, !description.isEmpty {
-                Text(description)
+            if !task.todo.isEmpty {
+                Text(task.todo)
                     .font(.subheadline)
                     .foregroundColor(.gray)
             }
             //                            if let date = task.date {
-            Text((task.date ?? Date()).formatted(date: .numeric, time: .omitted))
+            Text((task.date).formatted(date: .numeric, time: .omitted))
                 .font(.caption)
                 .foregroundColor(.secondary)
             //                            }
@@ -299,6 +290,17 @@ extension TaskListView {
         .foregroundStyle(.appWhite.opacity(!task.completed ? 1 : 0.5))
     }
     
+}
+
+extension TaskListView {
+    // voice
+    private func toggleRecording() {
+        if speechHelper.isRecording {
+            speechHelper.stopRecording()
+        } else {
+            speechHelper.startRecording()
+        }
+    }
 }
 
 internal import CoreData
