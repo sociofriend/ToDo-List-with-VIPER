@@ -247,6 +247,11 @@ extension TaskListView {
                 .foregroundColor(.secondary)
         }
         .foregroundStyle(.appWhite.opacity(!task.completed ? 1 : 0.5))
+        .onChange(of: presenter.tasks) { oldValue in
+            print("\n- - - - - - ")
+            print(oldValue)
+            print("- - - - - - \n")
+        }
     }
     
 }

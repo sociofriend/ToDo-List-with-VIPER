@@ -3,4 +3,52 @@
    uuid = "A6121884-313E-418D-B2E1-895598ACDA40"
    type = "1"
    version = "2.0">
+   <Breakpoints>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "D12AA095-5533-4606-BFCD-F71307F6FEC9"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ToDO List/VIPER/Interactors/TaskListInteractorProtocol.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "65"
+            endingLineNumber = "65"
+            landmarkName = "fetchItems()"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "D12AA095-5533-4606-BFCD-F71307F6FEC9 - 6ccec0d6a2a8e5d0"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(2) suspend resume partial function for closure #1 () async -&gt; () in ToDO_List.TaskListInteractor.fetchItems() -&gt; ()"
+                  moduleName = "ToDO List.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/sociofriend/Desktop/ToDO%20List/ToDO%20List/VIPER/Interactors/TaskListInteractorProtocol.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "65"
+                  endingLineNumber = "65">
+               </Location>
+               <Location
+                  uuid = "D12AA095-5533-4606-BFCD-F71307F6FEC9 - a4c06dc87b01f2b8"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #2 @Swift.MainActor @Sendable () -&gt; () in closure #1 () async -&gt; () in ToDO_List.TaskListInteractor.fetchItems() -&gt; ()"
+                  moduleName = "ToDO List.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/sociofriend/Desktop/ToDO%20List/ToDO%20List/VIPER/Interactors/TaskListInteractorProtocol.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "66"
+                  endingLineNumber = "66">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+   </Breakpoints>
 </Bucket>

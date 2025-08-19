@@ -20,10 +20,11 @@ protocol TaskListInteractorProtocol: AnyObject {
     associatedtype TaskModel: TodoPresentationProtocol
     associatedtype Response: ResponseProtocol
     
-    func fetchItems()
+    //crud
     func add(item: ToDo)
-    func removeItem(with id: Int)
+    func fetchItems()
     func update(_ item: ToDo)
+    func removeItem(with id: Int)
 }
 
 final class TaskListInteractor<ToDo, TaskModel, Response>: TaskListInteractorProtocol
@@ -42,6 +43,17 @@ where ToDo: TodoProtocol,
     }
     
     // MARK: - Public Methods
+    
+    func add(item: ToDo) {
+        Task {
+            do {
+                try await addItemToCoreData(item: item)
+            } catch {
+                print("❌ Failed to add item: \(error)")
+            }
+        }
+    }
+    
     func fetchItems() {
         Task {
             do {
@@ -58,13 +70,13 @@ where ToDo: TodoProtocol,
             }
         }
     }
-    
-    func add(item: ToDo) {
+
+    func update(_ item: ToDo) {
         Task {
             do {
-                try await addItemToCoreData(item: item)
+                try await updateItemInCoreData(item: item)
             } catch {
-                print("❌ Failed to add item: \(error)")
+                print("❌ Failed to update item: \(error)")
             }
         }
     }
@@ -79,41 +91,13 @@ where ToDo: TodoProtocol,
         }
     }
     
-    func update(_ item: ToDo) {
-        Task {
-            do {
-                try await updateItemInCoreData(item: item)
-            } catch {
-                print("❌ Failed to update item: \(error)")
-            }
-        }
-    }
-    
     // MARK: - Core Data Helpers
-    private func fetchTasksFromCoreData() async throws -> [TodoDTO] {
-        try await context.perform {
-            let fetchRequest: NSFetchRequest<ToDoEntity> = ToDoEntity.fetchRequest()
-            let entities = try self.context.fetch(fetchRequest)
-            return entities.compactMap { entity in
-                guard let todoValue = entity.todo else { return nil }
-                return TodoDTO(
-                    id: entity.id,
-                    title: entity.title ?? "",
-                    todo: todoValue,
-                    completed: entity.completed,
-                    userId: entity.userId,
-                    date: entity.date
-                )
-            }
-        }
-    }
-    
     private func addItemToCoreData(item: ToDo) async throws {
         try await context.perform {
             let entity = ToDoEntity(context: self.context)
             entity.id = item.id
             entity.todo = item.todo
-            entity.title = item.title
+            entity.title = item.title ?? ""
             entity.completed = item.completed
             entity.userId = item.userId
             entity.date = item.date
@@ -121,15 +105,20 @@ where ToDo: TodoProtocol,
         }
     }
     
-    private func removeItemFromCoreData(id: Int64) async throws {
+    private func fetchTasksFromCoreData() async throws -> [TodoDTO] {
         try await context.perform {
             let fetchRequest: NSFetchRequest<ToDoEntity> = ToDoEntity.fetchRequest()
-            fetchRequest.predicate = NSPredicate(format: "id == %lld", id)
             let entities = try self.context.fetch(fetchRequest)
-            for entity in entities {
-                self.context.delete(entity)
+            return entities.compactMap { entity in
+                return TodoDTO(
+                    id: entity.id,
+                    title: entity.title,
+                    todo: entity.todo ?? "",
+                    completed: entity.completed,
+                    userId: entity.userId,
+                    date: entity.date
+                )
             }
-            try self.context.save()
         }
     }
     
@@ -145,6 +134,18 @@ where ToDo: TodoProtocol,
                 entity.date = item.date
                 try self.context.save()
             }
+        }
+    }
+    
+    private func removeItemFromCoreData(id: Int64) async throws {
+        try await context.perform {
+            let fetchRequest: NSFetchRequest<ToDoEntity> = ToDoEntity.fetchRequest()
+            fetchRequest.predicate = NSPredicate(format: "id == %lld", id)
+            let entities = try self.context.fetch(fetchRequest)
+            for entity in entities {
+                self.context.delete(entity)
+            }
+            try self.context.save()
         }
     }
 }
