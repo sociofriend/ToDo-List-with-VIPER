@@ -20,11 +20,11 @@ protocol TodoPresentationProtocol: Codable, Identifiable, Hashable {
 
 struct TodoPresentationModel: TodoPresentationProtocol {
     
-    let id: Int
+    var id: Int
     var title: String
     var todo: String
     var completed: Bool
-    let userId: Int
+    var userId: Int
     var date: Date
     
     init(task: any TodoProtocol) {

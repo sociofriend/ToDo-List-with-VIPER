@@ -34,25 +34,38 @@ struct TaskListView<Task: TodoProtocol, TaskModel: TodoPresentationProtocol, Res
             VStack(spacing: 0) {
                 
                 if let taskId = selectedTaskId {
-                    let task = presenter.tasks.first(where: { $0.id == taskId })!
-                    TaskDetailsView(
-                        title: Binding(get: { 
-                            task.title
-                        }, set: { newTitle in
-                            presenter.updateTitle(for: taskId, with: newTitle)
-                        }), 
-                        todo: Binding(get: { 
-                            task.todo
-                        }, set: { newTodo in
-                            presenter.updateTodo(for: taskId, with: newTodo)
-                        }),
-                        date: Binding(get: { 
-                            task.date
-                        }, set: { _ in }), 
-                        onDismiss: {
+                    if let task = presenter.tasks.first(where: { $0.id == taskId }) {
+                        TaskDetailsView(
+                            title: Binding(get: { 
+                                task.title
+                            }, set: { newTitle in
+                                presenter.updateTitle(for: taskId, with: newTitle)
+                            }), 
+                            todo: Binding(get: { 
+                                task.todo
+                            }, set: { newTodo in
+                                presenter.updateTodo(for: taskId, with: newTodo)
+                            }),
+                            date: task.date, 
+                            onDismiss: {
+                                self.selectedTaskId = nil
+                            }
+                        )
+                    } else {
+                        
+                        NewTaskDetailsView() { title, todo in
+                            
+                            presenter.addItem(
+                                id: presenter.tasks.count + 1, 
+                                title: title, 
+                                todo: todo, 
+                                completed: false, 
+                                userID: presenter.tasks.count > 0 ? presenter.tasks[0].userId : 1, 
+                                date: Date())
+                            
                             self.selectedTaskId = nil
                         }
-                    )
+                    }
                 } else {
                     searchView()
                     listView()
@@ -102,9 +115,9 @@ extension TaskListView {
         
         List(filteredTasks, id: \.id) { task in
             HStack(alignment: .center) {
-                Image(systemName: (!task.completed ? "circle" : "checkmark.circle"))
+                Image(systemName: (task.completed ? "checkmark.circle" : "circle" ))
                     .resizable()
-                    .foregroundStyle(!task.completed ? .appWhite : .accent)
+                    .foregroundStyle(task.completed ? .accent : .appWhite)
                     .frame(width: 24, height: 24)
                     .onTapGesture {
                         // change completed in core data
@@ -197,7 +210,11 @@ extension TaskListView {
             HStack {
                 Spacer()
                 Button {
-                    
+                    if let last = presenter.tasks.last {
+                        selectedTaskId = last.id + 1
+                    } else {
+                        selectedTaskId = 1
+                    }
                 } label: {
                     Image(systemName: "square.and.pencil")
                         .resizable()

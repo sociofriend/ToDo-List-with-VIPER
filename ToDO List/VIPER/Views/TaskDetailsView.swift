@@ -10,7 +10,7 @@ import SwiftUI
 struct TaskDetailsView: View {
     @Binding var title: String
     @Binding var todo: String
-    @Binding var date: Date
+    var date: Date
     
     var onDismiss: () -> Void
     
@@ -54,6 +54,55 @@ struct TaskDetailsView: View {
                     Image(systemName: "chevron.left")
                     Button("Назад") { 
                         onDismiss()
+                    }
+                }
+                .foregroundStyle(.accent)
+            }
+        }
+    }
+}
+
+
+struct NewTaskDetailsView: View {
+    
+    @State var title: String = ""
+    @State var todo: String = ""
+    var date: Date =  Date()
+    
+    var onDismiss: (String,String) -> Void
+    
+    var dateString: String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "dd/MM/yyyy"
+        return formatter.string(from: date)
+    }
+    
+    var body: some View {
+        VStack(alignment: .leading) {
+            
+            TextField("Title..", text: $title)
+            .font(.system(size: 34, weight: .bold))
+            .multilineTextAlignment(.leading)
+            .padding(.vertical, 4)
+            
+            Text(dateString)
+                .font(.system(size: 12, weight: .regular))
+                .foregroundStyle(.appWhite.opacity(0.5))
+            
+            
+            TextField("Description..", text: $todo)
+            .font(.system(size: 16, weight: .regular))
+            .multilineTextAlignment(.leading)
+            
+            Spacer()
+        }
+        .padding()
+        .toolbar {
+            ToolbarItem(placement: .topBarLeading) { 
+                HStack {
+                    Image(systemName: "chevron.left")
+                    Button("Назад") { 
+                        onDismiss(title, todo)
                     }
                 }
                 .foregroundStyle(.accent)

@@ -17,6 +17,8 @@ protocol TaskListPresenterProtocol: ObservableObject {
     func checkboxToggled(for id: Int)
     func updateTitle(for id: Int, with newTitle: String)
     func updateTodo(for id: Int, with newTodo: String)
+    func addItem(id: Int, title: String, todo: String, completed: Bool, userID: Int, date: Date)
+    func remove(at id: Int)
 }
 
 
@@ -76,6 +78,14 @@ final class TaskListPresenter<Task, TaskModel, Response>: ObservableObject, Task
     private func update(_ task: Task) {
         if let interactor = interactor as? TaskListInteractor<Task, TaskModel, Response> {
             interactor.update(task)
+        }
+    }
+    
+    func addItem(id: Int, title: String, todo: String, completed: Bool, userID: Int, date: Date) {
+        // guard item with given id does not exist in db
+        let newTask = Task(id: Int64(id), title: title, todo: todo, completed: completed, userId: Int64(userID), date: date)
+        if let interactor = interactor as? TaskListInteractor<Task, TaskModel, Response> {
+            interactor.add(item: newTask)
         }
     }
 }
