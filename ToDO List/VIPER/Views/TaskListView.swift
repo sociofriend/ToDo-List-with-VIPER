@@ -80,6 +80,10 @@ extension TaskListView {
                     .resizable()
                     .foregroundStyle(!task.completed ? .appWhite : .accent)
                     .frame(width: 24, height: 24)
+                    .onTapGesture {
+                        // change completed in core data
+                        presenter.checkboxToggled(for: task.id)
+                    }
                 preview(task)
             }
             .listRowBackground(Color(.systemBackground))

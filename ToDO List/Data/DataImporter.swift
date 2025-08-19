@@ -12,7 +12,7 @@ internal import CoreData
 
 struct DataImporter<Task: TodoProtocol, Response: ResponseProtocol> where Response.Task == Task {
     
-    static func importJSON(context: NSManagedObjectContext) {
+    static func importJSON(context: NSManagedObjectContext) async throws {
         guard let url = Bundle.main.url(forResource: "todos", withExtension: "json"),
               let data = try? Data(contentsOf: url),
               let response = try? JSONDecoder().decode(Response.self, from: data) else {

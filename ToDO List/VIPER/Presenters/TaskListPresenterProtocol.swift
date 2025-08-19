@@ -13,6 +13,7 @@ protocol TaskListPresenterProtocol: ObservableObject {
     var tasks: [Task] { get set }
     func loadTasks()
     func didFetchTasks(_ tasks: [Task])
+    func checkboxToggled(for id: Task.ID)
 }
 
 
@@ -33,5 +34,15 @@ final class TaskListPresenter<Task, Response>: ObservableObject, TaskListPresent
 
     func didFetchTasks(_ tasks: [Task]) {
         self.tasks = tasks
+    }
+
+    func checkboxToggled(for id: Task.ID) {
+        guard let index = tasks.firstIndex(where: { $0.id == id }) else { return }
+        var task = tasks[index]
+        task.completed.toggle()
+        tasks[index] = task
+        if let interactor = interactor as? TaskListInteractor<Task, Response> {
+            interactor.update(task)
+        }
     }
 }

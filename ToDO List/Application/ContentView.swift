@@ -12,8 +12,12 @@ struct ContentView: View {
     
     var body: some View {
         TaskListRouter<TodoDTO, ResponseDTO>.createModule()
-            .onAppear {
-                    DataImporter<TodoDTO, ResponseDTO>.importJSON(context: context)
+            .task {
+                do {
+                    try await DataImporter<TodoDTO, ResponseDTO>.importJSON(context: context)
+                } catch {
+                    print(error)
+                }
             }
     }
 }
