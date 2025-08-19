@@ -8,11 +8,18 @@
 import SwiftUI
 
 struct TaskDetailsView: View {
-    @Binding var title: String
-    @Binding var todo: String
+    @State var title: String 
+    @State var todo: String
     var date: Date
     
-    var onDismiss: () -> Void
+    var onDismiss: (String,String) -> Void
+    
+    init(title: String, todo: String, date: Date, onDismiss: @escaping (String, String) -> Void) {
+        self._title = State(wrappedValue: title)
+        self._todo = State(wrappedValue: todo)
+        self.date = date
+        self.onDismiss = onDismiss
+    }
     
     var dateString: String {
         let formatter = DateFormatter()
@@ -23,11 +30,7 @@ struct TaskDetailsView: View {
     var body: some View {
         VStack(alignment: .leading) {
             
-            TextField("Title..", text: Binding(get: { 
-                title
-            }, set: { newTitle in
-                title = newTitle
-            }))
+            TextField("Title..", text: $title)
             .font(.system(size: 34, weight: .bold))
             .multilineTextAlignment(.leading)
             .padding(.vertical, 4)
@@ -37,13 +40,11 @@ struct TaskDetailsView: View {
                 .foregroundStyle(.appWhite.opacity(0.5))
 
             
-            TextField("Description..", text: Binding(get: { 
-                todo
-            }, set: { newTodo in
-                todo = newTodo
-            }))
+            TextEditor(text: $todo)
                 .font(.system(size: 16, weight: .regular))
                 .multilineTextAlignment(.leading)
+                .frame(minHeight: 100) // so it looks like a text area
+                .padding(.vertical, 4)
             
             Spacer()
         }
@@ -53,7 +54,7 @@ struct TaskDetailsView: View {
                 HStack {
                     Image(systemName: "chevron.left")
                     Button("Назад") { 
-                        onDismiss()
+                        onDismiss(title, todo)
                     }
                 }
                 .foregroundStyle(.accent)

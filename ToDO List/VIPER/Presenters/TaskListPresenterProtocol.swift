@@ -15,8 +15,7 @@ protocol TaskListPresenterProtocol: ObservableObject {
     func loadTasks()
     func didFetchTasks(_ tasks: [TaskModel])
     func checkboxToggled(for id: Int)
-    func updateTitle(for id: Int, with newTitle: String)
-    func updateTodo(for id: Int, with newTodo: String)
+    func update(_ task: Task) 
     func addItem(id: Int, title: String, todo: String, completed: Bool, userID: Int, date: Date)
     func remove(at id: Int)
 }
@@ -56,26 +55,13 @@ final class TaskListPresenter<Task, TaskModel, Response>: ObservableObject, Task
         update(Task(task))
     }
     
-    func updateTitle(for id: Int, with newTitle: String) {
-        guard let index = tasks.firstIndex(where: { $0.id == id }) else { return }
-        var task = tasks[index]
-        task.title = newTitle
-        task.date = Date()
+    func update(_ task: TaskModel) {
+        guard let index = tasks.firstIndex(where: { $0.id == task.id }) else { return }
         tasks[index] = task
         update(Task(task))
     }
     
-    
-    func updateTodo(for id: Int, with newTodo: String) {
-        guard let index = tasks.firstIndex(where: { $0.id == id }) else { return }
-        var task = tasks[index]
-        task.todo = newTodo
-        task.date = Date()
-        tasks[index] = task
-        update(Task(task))
-    }
-    
-    private func update(_ task: Task) {
+    func update(_ task: Task) {
         if let interactor = interactor as? TaskListInteractor<Task, TaskModel, Response> {
             interactor.update(task)
         }

@@ -35,22 +35,18 @@ struct TaskListView<Task: TodoProtocol, TaskModel: TodoPresentationProtocol, Res
                 
                 if let taskId = selectedTaskId {
                     if let task = presenter.tasks.first(where: { $0.id == taskId }) {
-                        TaskDetailsView(
-                            title: Binding(get: { 
-                                task.title
-                            }, set: { newTitle in
-                                presenter.updateTitle(for: taskId, with: newTitle)
-                            }), 
-                            todo: Binding(get: { 
-                                task.todo
-                            }, set: { newTodo in
-                                presenter.updateTodo(for: taskId, with: newTodo)
-                            }),
-                            date: task.date, 
-                            onDismiss: {
-                                self.selectedTaskId = nil
-                            }
-                        )
+                        TaskDetailsView(title: task.title, todo: task.todo, date: task.date) { title, todo in
+                            presenter.update(
+                                Task(
+                                    id: Int64(task.id), 
+                                    title: title, 
+                                    todo: todo, 
+                                    completed: task.completed, 
+                                    userId: Int64(task.userId), 
+                                    date: Date()))
+                            selectedTaskId = nil
+                        }
+                        
                     } else {
                         
                         NewTaskDetailsView() { title, todo in
@@ -69,9 +65,8 @@ struct TaskListView<Task: TodoProtocol, TaskModel: TodoPresentationProtocol, Res
                 } else {
                     searchView()
                     listView()
+                    bottomView()
                 }
-                
-                bottomView()
             }
 
         }
@@ -244,6 +239,7 @@ extension TaskListView {
                 .font(.system(size: 12))
                 .strikethrough((task.title.isEmpty == true) && task.completed)
                 .fontWeight(.regular)
+                .frame(maxHeight: 70)
             
 
             Text((task.date).formatted(date: .numeric, time: .omitted))
