@@ -5,22 +5,34 @@
 //  Created by Lilit Avdalyan on 15.08.25.
 //
 
+//
+//  TaskListInteractorProtocol.swift
+//  ToDO List
+//
+//  Created by Lilit Avdalyan on 15.08.25.
+//
+
 import SwiftUI
 internal import CoreData
 
 protocol TaskListInteractorProtocol: AnyObject {
-    associatedtype ToDo where ToDo: TodoProtocol
-    associatedtype Response where Response: ResponseProtocol
+    associatedtype ToDo: TodoProtocol
+    associatedtype TaskModel: TodoPresentationProtocol
+    associatedtype Response: ResponseProtocol
+    
     func fetchItems()
+    func add(item: ToDo)
+    func removeItem(with id: Int)
+    func update(_ item: ToDo)
 }
 
-final class TaskListInteractor<ToDo, Response>: TaskListInteractorProtocol
-where ToDo: TodoProtocol, Response: ResponseProtocol {
+final class TaskListInteractor<ToDo, TaskModel, Response>: TaskListInteractorProtocol
+where ToDo: TodoProtocol,
+      TaskModel: TodoPresentationProtocol,
+      Response: ResponseProtocol {
     
-    typealias ToDo = ToDo
-    typealias Response = Response
-    
-    var presenter: TaskListPresenter<ToDo, Response>?
+    // Presenter
+    weak var presenter: TaskListPresenter<ToDo, TaskModel, Response>?
     
     // Reference to Core Data
     private let context: NSManagedObjectContext
@@ -29,19 +41,20 @@ where ToDo: TodoProtocol, Response: ResponseProtocol {
         self.context = context
     }
     
+    // MARK: - Public Methods
     func fetchItems() {
         Task {
             do {
-                // Perform fetch in background queue
-                if let tasks = try await fetchTasksFromCoreData() as? [ToDo] {
-                    
-                    // Send tasks back to presenter on main thread
-                    DispatchQueue.main.async {
-                        self.presenter?.didFetchTasks(tasks)
-                    }
+                let tasks = try await fetchTasksFromCoreData()
+                
+                // Convert DTO -> Presentation model
+                let presentationTasks = tasks.map { TaskModel(task: $0) }
+                
+                DispatchQueue.main.async {
+                    self.presenter?.didFetchTasks(presentationTasks)
                 }
             } catch {
-                print("Failed to fetch tasks from Core Data: \(error)")
+                print("❌ Failed to fetch tasks from Core Data: \(error)")
             }
         }
     }
@@ -49,9 +62,9 @@ where ToDo: TodoProtocol, Response: ResponseProtocol {
     func add(item: ToDo) {
         Task {
             do {
-                try await self.addItemToCoreData(item: item)
+                try await addItemToCoreData(item: item)
             } catch {
-                print("Failed to add item to Core Data: \(error)")
+                print("❌ Failed to add item: \(error)")
             }
         }
     }
@@ -59,9 +72,9 @@ where ToDo: TodoProtocol, Response: ResponseProtocol {
     func removeItem(with id: Int) {
         Task {
             do {
-                try await self.removeItemFromCoreData(id: Int64(id))
+                try await removeItemFromCoreData(id: Int64(id))
             } catch {
-                print("Failed to remove item from Core Data: \(error)")
+                print("❌ Failed to remove item: \(error)")
             }
         }
     }
@@ -69,25 +82,22 @@ where ToDo: TodoProtocol, Response: ResponseProtocol {
     func update(_ item: ToDo) {
         Task {
             do {
-                try await self.updateItemInCoreData(item: item)
+                try await updateItemInCoreData(item: item)
             } catch {
-                print("Failed to update item in Core Data: \(error)")
+                print("❌ Failed to update item: \(error)")
             }
         }
     }
     
-    
-    
-    // MARK: - Core Data Fetch
+    // MARK: - Core Data Helpers
     private func fetchTasksFromCoreData() async throws -> [TodoDTO] {
         try await context.perform {
             let fetchRequest: NSFetchRequest<ToDoEntity> = ToDoEntity.fetchRequest()
             let entities = try self.context.fetch(fetchRequest)
             return entities.compactMap { entity in
                 guard let todoValue = entity.todo else { return nil }
-                let id = entity.id
                 return TodoDTO(
-                    id: id,
+                    id: entity.id,
                     title: entity.title ?? "",
                     todo: todoValue,
                     completed: entity.completed,
@@ -127,8 +137,7 @@ where ToDo: TodoProtocol, Response: ResponseProtocol {
         try await context.perform {
             let fetchRequest: NSFetchRequest<ToDoEntity> = ToDoEntity.fetchRequest()
             fetchRequest.predicate = NSPredicate(format: "id == %lld", item.id)
-            let entities = try self.context.fetch(fetchRequest)
-            if let entity = entities.first {
+            if let entity = try self.context.fetch(fetchRequest).first {
                 entity.title = item.title
                 entity.todo = item.todo
                 entity.completed = item.completed

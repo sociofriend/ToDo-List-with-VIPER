@@ -9,17 +9,19 @@
 import SwiftUI
 import Speech
 
-struct TaskListView<Task: TodoProtocol, Response: ResponseProtocol>: View {
+struct TaskListView<Task: TodoProtocol, TaskModel: TodoPresentationProtocol, Response: ResponseProtocol>: View {
     
-    @ObservedObject var presenter: TaskListPresenter<Task, Response>
+    @ObservedObject var presenter: TaskListPresenter<Task, TaskModel, Response>
     @StateObject private var speechHelper = SpeechRecognizerHelper()
     @State private var searchInput: String = ""
     
-    var filteredTasks: [Task] {
+    @State var selectedTaskId: Int? = nil
+    
+    var filteredTasks: [TaskModel] {
         let base = searchInput.isEmpty
         ? presenter.tasks
         : presenter.tasks.filter {
-            ($0.title?.localizedCaseInsensitiveContains(searchInput)) ?? false ||
+            ($0.title.localizedCaseInsensitiveContains(searchInput)) ||
             $0.todo.localizedCaseInsensitiveContains(searchInput)
         }
         
@@ -30,13 +32,35 @@ struct TaskListView<Task: TodoProtocol, Response: ResponseProtocol>: View {
     var body: some View {
         NavigationView {
             VStack(spacing: 0) {
-                searchView()
                 
-                listView()
+                if let taskId = selectedTaskId {
+                    let task = presenter.tasks.first(where: { $0.id == taskId })!
+                    TaskDetailsView(
+                        title: Binding(get: { 
+                            task.title
+                        }, set: { newTitle in
+                            presenter.updateTitle(for: taskId, with: newTitle)
+                        }), 
+                        todo: Binding(get: { 
+                            task.todo
+                        }, set: { newTodo in
+                            presenter.updateTodo(for: taskId, with: newTodo)
+                        }),
+                        date: Binding(get: { 
+                            task.date
+                        }, set: { _ in }), 
+                        onDismiss: {
+                            self.selectedTaskId = nil
+                        }
+                    )
+                } else {
+                    searchView()
+                    listView()
+                }
                 
                 bottomView()
             }
-            .navigationTitle("Задачи")
+
         }
         
     }    
@@ -74,6 +98,8 @@ extension TaskListView {
     
     @ViewBuilder
     fileprivate func listView() -> some View {
+        
+        
         List(filteredTasks, id: \.id) { task in
             HStack(alignment: .center) {
                 Image(systemName: (!task.completed ? "circle" : "checkmark.circle"))
@@ -84,13 +110,17 @@ extension TaskListView {
                         // change completed in core data
                         presenter.checkboxToggled(for: task.id)
                     }
+                
                 preview(task)
+            }
+            .onTapGesture {
+                selectedTaskId = task.id
             }
             .listRowBackground(Color(.systemBackground))
             .contextMenu(menuItems: {
                 VStack {
                     Button {
-                        
+                        selectedTaskId = task.id
                     } label: {
                         HStack {
                             Text("Редактировать")
@@ -108,7 +138,7 @@ extension TaskListView {
                         }
                     }
                     Button {
-                        
+                        presenter.remove(at: Int(task.id))
                     } label: {
                         HStack {
                             Text("Удалить")
@@ -154,6 +184,7 @@ extension TaskListView {
                 }
             }
         }
+        .navigationTitle("Задачи")
     }
     
     fileprivate func bottomView() -> some View {
@@ -182,11 +213,11 @@ extension TaskListView {
     }
     
     @ViewBuilder
-    private func preview(_ task: Task) -> some View {
+    private func preview(_ task: TaskModel) -> some View {
         VStack(alignment: .leading, spacing: 4) {
             
-            if let title = task.title, !title.isEmpty {
-                Text(title)
+            if !task.title.isEmpty {
+                Text(task.title)
                     .font(.system(size: 16))
                     .strikethrough(task.completed)
                     .fontWeight(.medium)
@@ -194,15 +225,11 @@ extension TaskListView {
             
             Text(task.todo)
                 .font(.system(size: 12))
-                .strikethrough((task.title == nil || task.title?.isEmpty == true) && task.completed)
+                .strikethrough((task.title.isEmpty == true) && task.completed)
                 .fontWeight(.regular)
             
-            if !task.todo.isEmpty {
-                Text(task.todo)
-                    .font(.subheadline)
-                    .foregroundColor(.gray)
-            }
-            Text((task.date ?? Date()).formatted(date: .numeric, time: .omitted))
+
+            Text((task.date).formatted(date: .numeric, time: .omitted))
                 .font(.caption)
                 .foregroundColor(.secondary)
         }
@@ -211,6 +238,7 @@ extension TaskListView {
     
 }
 
+//functions
 extension TaskListView {
     // voice
     private func toggleRecording() {

@@ -17,6 +17,8 @@ protocol TodoProtocol: Codable, Identifiable, Hashable {
     var date: Date? { get set }
 
     init(id: Int64, title: String?, todo: String, completed: Bool, userId: Int64, date: Date?)
+    
+    init(_ presentationTask: any TodoPresentationProtocol)
 }
 
 struct TodoDTO: TodoProtocol {
@@ -35,6 +37,15 @@ struct TodoDTO: TodoProtocol {
         self.completed = completed
         self.userId = userId
         self.date = Date()
+    }
+    
+    init(_ presentationTask: any TodoPresentationProtocol) {
+        self.id = Int64(presentationTask.id)
+        self.title = presentationTask.title
+        self.todo = presentationTask.todo
+        self.completed = presentationTask.completed
+        self.userId = Int64(presentationTask.userId)
+        self.date = presentationTask.date
     }
 }
 

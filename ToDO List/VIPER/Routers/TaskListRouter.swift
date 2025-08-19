@@ -12,11 +12,12 @@ protocol TaskListRouterProtocol {
     static func createModule() -> TaskListViewType
 }
 
-class TaskListRouter<Task, Response>: TaskListRouterProtocol where Task: TodoProtocol, Response: ResponseProtocol {
+class TaskListRouter<Task, TaskModel, Response>: TaskListRouterProtocol where Task: TodoProtocol, TaskModel: TodoPresentationProtocol, Response: ResponseProtocol {
+    
     static func createModule() -> some View {
-        let interactor = TaskListInteractor<Task, Response>()
-        let presenter = TaskListPresenter<Task, Response>(interactor: interactor)
+        let interactor = TaskListInteractor<Task, TaskModel, Response>()
+        let presenter = TaskListPresenter<Task, TaskModel, Response>(interactor: interactor)
         interactor.presenter = presenter
-        return TaskListView<Task, Response>(presenter: presenter)
+        return TaskListView<Task, TaskModel, Response>(presenter: presenter)
     }
 }

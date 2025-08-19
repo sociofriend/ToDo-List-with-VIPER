@@ -13,6 +13,14 @@ internal import CoreData
 struct DataImporter<Task: TodoProtocol, Response: ResponseProtocol> where Response.Task == Task {
     
     static func importJSON(context: NSManagedObjectContext) async throws {
+        
+        // check if there is a data in container, don't import 
+        let fetchRequest: NSFetchRequest<ToDoEntity> = ToDoEntity.fetchRequest()
+        fetchRequest.fetchLimit = 1
+        if  (try? context.fetch(fetchRequest).first) != nil {
+            return }
+        
+        
         guard let url = Bundle.main.url(forResource: "todos", withExtension: "json"),
               let data = try? Data(contentsOf: url),
               let response = try? JSONDecoder().decode(Response.self, from: data) else {
@@ -26,24 +34,20 @@ struct DataImporter<Task: TodoProtocol, Response: ResponseProtocol> where Respon
             fetchRequest.predicate = NSPredicate(format: "id == %d", task.id)
             fetchRequest.fetchLimit = 1
             
-            let existing = try? context.fetch(fetchRequest).first
-            
-            let entity: ToDoEntity
-            if let existing = existing {
-                // Update existing entity
-                entity = existing
+            if  (try? context.fetch(fetchRequest).first) != nil {
+                return 
             } else {
                 // Insert new entity
-                entity = ToDoEntity(context: context)
+                let entity: ToDoEntity = ToDoEntity(context: context)
+                
+                // Update fields
+                entity.id = task.id
+                entity.title = task.title ?? ""
+                entity.todo = task.todo
+                entity.completed = task.completed
+                entity.userId = task.userId
+                entity.date = task.date ?? Date()
             }
-            
-            // Update fields
-            entity.id = task.id
-            entity.todo = task.todo
-            entity.title = task.title
-            entity.completed = task.completed
-            entity.userId = task.userId
-            entity.date = task.date
         }
         
         do {

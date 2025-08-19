@@ -11,7 +11,7 @@ struct ContentView: View {
     @Environment(\.managedObjectContext) private var context
     
     var body: some View {
-        TaskListRouter<TodoDTO, ResponseDTO>.createModule()
+        TaskListRouter<TodoDTO, TodoPresentationModel, ResponseDTO>.createModule()
             .task {
                 do {
                     try await DataImporter<TodoDTO, ResponseDTO>.importJSON(context: context)

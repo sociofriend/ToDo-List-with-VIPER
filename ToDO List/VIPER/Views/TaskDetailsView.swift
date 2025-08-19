@@ -7,31 +7,27 @@
 
 import SwiftUI
 
-struct TaskDetailsView<Task: TodoProtocol>: View {
+struct TaskDetailsView: View {
+    @Binding var title: String
+    @Binding var todo: String
+    @Binding var date: Date
     
-    @Binding var task: Task
-    
-    private var titleBinding: Binding<String> {
-        Binding(
-            get: { task.title ?? "" },
-            set: { task.title = $0 }
-        )
-    }
+    var onDismiss: () -> Void
     
     var dateString: String {
         let formatter = DateFormatter()
         formatter.dateFormat = "dd/MM/yyyy"
-        if let date = task.date {
             return formatter.string(from: date)
-        } else {
-            return "No date"
-        }
     }
     
     var body: some View {
         VStack(alignment: .leading) {
             
-            TextField("Title..", text: titleBinding)
+            TextField("Title..", text: Binding(get: { 
+                title
+            }, set: { newTitle in
+                title = newTitle
+            }))
             .font(.system(size: 34, weight: .bold))
             .multilineTextAlignment(.leading)
             .padding(.vertical, 4)
@@ -41,16 +37,27 @@ struct TaskDetailsView<Task: TodoProtocol>: View {
                 .foregroundStyle(.appWhite.opacity(0.5))
 
             
-            TextField("Description..", text: $task.todo)
+            TextField("Description..", text: Binding(get: { 
+                todo
+            }, set: { newTodo in
+                todo = newTodo
+            }))
                 .font(.system(size: 16, weight: .regular))
                 .multilineTextAlignment(.leading)
+            
+            Spacer()
+        }
+        .padding()
+        .toolbar {
+            ToolbarItem(placement: .topBarLeading) { 
+                HStack {
+                    Image(systemName: "chevron.left")
+                    Button("Назад") { 
+                        onDismiss()
+                    }
+                }
+                .foregroundStyle(.accent)
+            }
         }
     }
 }
-
-
-#Preview {
-    @State var sampleTask = TodoDTO(id: 87, todo: "Todo title", completed: false, userId: 99)
-    return TaskDetailsView<TodoDTO>(task: $sampleTask)
-}
-
