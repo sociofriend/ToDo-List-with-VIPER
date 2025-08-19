@@ -28,7 +28,7 @@ final class TaskListPresenter<Task, Response>: ObservableObject, TaskListPresent
     }
 
     func loadTasks() {
-        interactor.fetchTasks()
+        interactor.fetchItems()
     }
 
     func didFetchTasks(_ tasks: [Task]) {

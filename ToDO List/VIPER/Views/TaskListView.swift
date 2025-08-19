@@ -93,6 +93,7 @@ extension TaskListView {
                             .frame(width: 24, height: 24)
                         preview(task)
                     }
+                    
                     .listRowBackground(Color(.systemBackground))
                     .contextMenu(menuItems: {
                         VStack {
