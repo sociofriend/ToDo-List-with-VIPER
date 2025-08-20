@@ -5,13 +5,6 @@
 //  Created by Lilit Avdalyan on 16.08.25.
 //
 
-//
-//  SpeechRecognizerHelper.swift
-//  ToDO List
-//
-//  Created by Lilit Avdalyan on 16.08.25.
-//
-
 import Foundation
 import Speech
 import AVFoundation

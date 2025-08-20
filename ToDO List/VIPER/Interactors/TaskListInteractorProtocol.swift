@@ -5,13 +5,6 @@
 //  Created by Lilit Avdalyan on 15.08.25.
 //
 
-//
-//  TaskListInteractorProtocol.swift
-//  ToDO List
-//
-//  Created by Lilit Avdalyan on 15.08.25.
-//
-
 import SwiftUI
 internal import CoreData
 
