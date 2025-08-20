@@ -38,6 +38,8 @@ struct TaskListView<Task: TodoProtocol, TaskModel: TodoPresentationProtocol, Res
                         TaskDetailsView(title: task.title, todo: task.todo, date: task.date) { title, todo in
                             selectedTaskId = nil
                             
+                            guard !title.isEmpty || !todo.isEmpty else { return }
+                            
                             presenter.update(
                                 Task(
                                     id: Int64(task.id), 
@@ -52,6 +54,7 @@ struct TaskListView<Task: TodoProtocol, TaskModel: TodoPresentationProtocol, Res
                         
                         NewTaskDetailsView() { title, todo in
                             self.selectedTaskId = nil
+                            guard !title.isEmpty || !todo.isEmpty else { return }
                             presenter.addItem(
                                 id: presenter.tasks.count + 1, 
                                 title: title, 
@@ -135,15 +138,11 @@ extension TaskListView {
                             Image(systemName: "square.and.pencil")
                         }
                     }
-                    Button {
-                        
-                    } label: {
-                        HStack {
-                            Text("Поделиться")
-                            Spacer()
-                            Image(systemName: "square.and.arrow.up")
-                        }
+   
+                    ShareLink(item: task.toSend()) {
+                        Label("Поделиться", systemImage: "square.and.arrow.up")
                     }
+                    
                     Button {
                         presenter.remove(at: Int(task.id))
                     } label: {
@@ -274,3 +273,4 @@ internal import CoreData
         .colorScheme(.dark)
         .environment(\.managedObjectContext, persistenceController.container.viewContext)
 }
+

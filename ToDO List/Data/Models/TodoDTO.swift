@@ -22,6 +22,7 @@ protocol TodoProtocol: Codable, Identifiable, Hashable {
 }
 
 struct TodoDTO: TodoProtocol {
+    
     var id: Int64
     var title: String
     var todo: String

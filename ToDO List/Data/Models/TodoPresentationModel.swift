@@ -17,6 +17,8 @@ protocol TodoPresentationProtocol: Codable, Identifiable, Hashable {
     
     init(id: Int64, title: String?, todo: String, completed: Bool, userId: Int64, date: Date?) 
     init(task: any TodoProtocol)
+    
+    func toSend() -> String
 }
 
 struct TodoPresentationModel: TodoPresentationProtocol {    
@@ -44,6 +46,13 @@ struct TodoPresentationModel: TodoPresentationProtocol {
         self.completed = completed
         self.userId = Int(userId)
         self.date = date ?? Date()
+    }
+    
+    func toSend() -> String {
+        let titleToSend = title.isEmpty ? "" : "\(title):"
+        let bodyToSend = todo.isEmpty ? "" : "\(todo)"
+        let dateToSend = " at \(date.formatted(date: .numeric, time: .omitted).description)"
+        return titleToSend + bodyToSend + dateToSend
     }
 }
 
