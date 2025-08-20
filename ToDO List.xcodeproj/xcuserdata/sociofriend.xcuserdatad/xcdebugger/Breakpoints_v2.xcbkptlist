@@ -3,4 +3,52 @@
    uuid = "A6121884-313E-418D-B2E1-895598ACDA40"
    type = "1"
    version = "2.0">
+   <Breakpoints>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "9876664D-EE3D-4ED9-BCF3-D8EDF1A95C78"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ToDO List/VIPER/Views/TaskListView.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "53"
+            endingLineNumber = "53"
+            landmarkName = "body"
+            landmarkType = "24">
+            <Locations>
+               <Location
+                  uuid = "9876664D-EE3D-4ED9-BCF3-D8EDF1A95C78 - c7dad49afa36503a"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 () -&gt; SwiftUI._ConditionalContent&lt;SwiftUI._ConditionalContent&lt;ToDO_List.TaskDetailsView, ToDO_List.NewTaskDetailsView&gt;, SwiftUI.TupleView&lt;(&lt;&lt;opaque return type of ToDO_List.TaskListView.searchView() -&gt; some&gt;&gt;.0, &lt;&lt;opaque return type of ToDO_List.TaskListView.listView() -&gt; some&gt;&gt;.0, &lt;&lt;opaque return type of ToDO_List.TaskListView.bottomView() -&gt; some&gt;&gt;.0)&gt;&gt; in closure #1 () -&gt; SwiftUI.VStack&lt;SwiftUI._ConditionalContent&lt;SwiftUI._ConditionalContent&lt;ToDO_List.TaskDetailsView, ToDO_List.NewTaskDetailsView&gt;, SwiftUI.TupleView&lt;(&lt;&lt;opaque return type of ToDO_List.TaskListView.searchView() -&gt; some&gt;&gt;.0, &lt;&lt;opaque return type of ToDO_List.TaskListView.listView() -&gt; some&gt;&gt;.0, &lt;&lt;opaque return type of ToDO_List.TaskListView.bottomView() -&gt; some&gt;&gt;.0)&gt;&gt;&gt; in ToDO_List.TaskListView.body.getter : some"
+                  moduleName = "ToDO List.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/sociofriend/Desktop/ToDO%20List/ToDO%20List/VIPER/Views/TaskListView.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "53"
+                  endingLineNumber = "53">
+               </Location>
+               <Location
+                  uuid = "9876664D-EE3D-4ED9-BCF3-D8EDF1A95C78 - 26ad0271633ad208"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #3 (Swift.String, Swift.String) -&gt; () in closure #1 () -&gt; SwiftUI._ConditionalContent&lt;SwiftUI._ConditionalContent&lt;ToDO_List.TaskDetailsView, ToDO_List.NewTaskDetailsView&gt;, SwiftUI.TupleView&lt;(&lt;&lt;opaque return type of ToDO_List.TaskListView.searchView() -&gt; some&gt;&gt;.0, &lt;&lt;opaque return type of ToDO_List.TaskListView.listView() -&gt; some&gt;&gt;.0, &lt;&lt;opaque return type of ToDO_List.TaskListView.bottomView() -&gt; some&gt;&gt;.0)&gt;&gt; in closure #1 () -&gt; SwiftUI.VStack&lt;SwiftUI._ConditionalContent&lt;SwiftUI._ConditionalContent&lt;ToDO_List.TaskDetailsView, ToDO_List.NewTaskDetailsView&gt;, SwiftUI.TupleView&lt;(&lt;&lt;opaque return type of ToDO_List.TaskListView.searchView() -&gt; some&gt;&gt;.0, &lt;&lt;opaque return type of ToDO_List.TaskListView.listView() -&gt; some&gt;&gt;.0, &lt;&lt;opaque return type of ToDO_List.TaskListView.bottomView() -&gt; some&gt;&gt;.0)&gt;&gt;&gt; in ToDO_List.TaskListView.body.getter : some"
+                  moduleName = "ToDO List.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/sociofriend/Desktop/ToDO%20List/ToDO%20List/VIPER/Views/TaskListView.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "54"
+                  endingLineNumber = "54">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+   </Breakpoints>
 </Bucket>

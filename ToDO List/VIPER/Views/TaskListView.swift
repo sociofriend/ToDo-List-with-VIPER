@@ -46,13 +46,12 @@ struct TaskListView<Task: TodoProtocol, TaskModel: TodoPresentationProtocol, Res
                                     completed: task.completed, 
                                     userId: Int64(task.userId), 
                                     date: Date()))
-              
                         }
                         
                     } else {
                         
                         NewTaskDetailsView() { title, todo in
-                            
+                            self.selectedTaskId = nil
                             presenter.addItem(
                                 id: presenter.tasks.count + 1, 
                                 title: title, 
@@ -60,8 +59,6 @@ struct TaskListView<Task: TodoProtocol, TaskModel: TodoPresentationProtocol, Res
                                 completed: false, 
                                 userID: presenter.tasks.count > 0 ? presenter.tasks[0].userId : 1, 
                                 date: Date())
-                            
-                            self.selectedTaskId = nil
                         }
                     }
                 } else {
@@ -207,8 +204,8 @@ extension TaskListView {
             HStack {
                 Spacer()
                 Button {
-                    if let last = presenter.tasks.last {
-                        selectedTaskId = last.id + 1
+                    if !presenter.tasks.isEmpty {
+                        selectedTaskId = presenter.tasks.count + 1
                     } else {
                         selectedTaskId = 1
                     }
