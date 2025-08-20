@@ -27,12 +27,30 @@ where ToDo: TodoProtocol,
     
     // Presenter
     weak var presenter: TaskListPresenter<ToDo, TaskModel, Response>?
+    var isLoaded: Bool = false {
+        didSet {
+            if isLoaded == true {
+                fetchItems()
+            }
+        }
+    }
     
     // Reference to Core Data
     private let context: NSManagedObjectContext
     
     init(context: NSManagedObjectContext = PersistenceController.shared.container.viewContext) {
         self.context = context
+        
+        Task {
+            do {
+                try await DataImporter<TodoDTO, ResponseDTO>.importJSON(context: context)
+                DispatchQueue.main.async {
+                    self.isLoaded = true
+                }
+            } catch {
+                print(error)
+            }
+        }
     }
     
     // MARK: - Public Methods

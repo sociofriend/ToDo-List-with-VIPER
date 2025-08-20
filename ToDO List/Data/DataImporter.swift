@@ -21,12 +21,7 @@ struct DataImporter<Task: TodoProtocol, Response: ResponseProtocol> where Respon
             return }
         
         
-        guard let url = Bundle.main.url(forResource: "todos", withExtension: "json"),
-              let data = try? Data(contentsOf: url),
-              let response = try? JSONDecoder().decode(Response.self, from: data) else {
-            print("url not found")
-            return
-        }
+        let response = try await Client<Response>.fetchResponse()
         
         for task in response.todos {
             // Check if entity exists (by ID for example)
@@ -53,7 +48,8 @@ struct DataImporter<Task: TodoProtocol, Response: ResponseProtocol> where Respon
         do {
             try context.save()
         } catch {
-            print("❌ Failed to save: \(error)")
+            print("Failed to fetch from API: \(error)")
+            return
         }
     }
 } 

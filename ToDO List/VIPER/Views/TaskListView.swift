@@ -66,13 +66,23 @@ struct TaskListView<Task: TodoProtocol, TaskModel: TodoPresentationProtocol, Res
                     }
                 } else {
                     searchView()
-                    listView()
+                    
+                    if !filteredTasks.isEmpty {
+                        listView()
+                    } else {
+                        VStack {
+                            Spacer()
+                            ProgressView()
+                                .tint(.accent)
+                            Spacer()
+                        }
+                    }
+                    
                     bottomView()
                 }
             }
 
-        }
-        
+        }        
     }    
 }
 
@@ -109,88 +119,87 @@ extension TaskListView {
     @ViewBuilder
     fileprivate func listView() -> some View {
         
-        
-        List(filteredTasks, id: \.id) { task in
-            HStack(alignment: .center) {
-                Image(systemName: (task.completed ? "checkmark.circle" : "circle" ))
-                    .resizable()
-                    .foregroundStyle(task.completed ? .accent : .appWhite)
-                    .frame(width: 24, height: 24)
-                    .onTapGesture {
-                        // change completed in core data
-                        presenter.checkboxToggled(for: task.id)
-                    }
-                
-                preview(task)
-            }
-            .onTapGesture {
-                selectedTaskId = task.id
-            }
-            .listRowBackground(Color(.systemBackground))
-            .contextMenu(menuItems: {
-                VStack {
-                    Button {
-                        selectedTaskId = task.id
-                    } label: {
-                        HStack {
-                            Text("Редактировать")
-                            Spacer()
-                            Image(systemName: "square.and.pencil")
+            List(filteredTasks, id: \.id) { task in
+                HStack(alignment: .center) {
+                    Image(systemName: (task.completed ? "checkmark.circle" : "circle" ))
+                        .resizable()
+                        .foregroundStyle(task.completed ? .accent : .appWhite)
+                        .frame(width: 24, height: 24)
+                        .onTapGesture {
+                            // change completed in core data
+                            presenter.checkboxToggled(for: task.id)
                         }
-                    }
-   
-                    ShareLink(item: task.toSend()) {
-                        Label("Поделиться", systemImage: "square.and.arrow.up")
-                    }
                     
-                    Button {
-                        presenter.remove(at: Int(task.id))
-                    } label: {
-                        HStack {
-                            Text("Удалить")
-                            Spacer()
-                            Image(systemName: "trash")
+                    preview(task)
+                }
+                .onTapGesture {
+                    selectedTaskId = task.id
+                }
+                .listRowBackground(Color(.systemBackground))
+                .contextMenu(menuItems: {
+                    VStack {
+                        Button {
+                            selectedTaskId = task.id
+                        } label: {
+                            HStack {
+                                Text("Редактировать")
+                                Spacer()
+                                Image(systemName: "square.and.pencil")
+                            }
                         }
-                        .foregroundStyle(.red)
+                        
+                        ShareLink(item: task.toSend()) {
+                            Label("Поделиться", systemImage: "square.and.arrow.up")
+                        }
+                        
+                        Button {
+                            presenter.remove(at: Int(task.id))
+                        } label: {
+                            HStack {
+                                Text("Удалить")
+                                Spacer()
+                                Image(systemName: "trash")
+                            }
+                            .foregroundStyle(.red)
+                        }
                     }
-                }
-            },
-                         preview: {
-                ZStack {
-                    HStack {
-                        preview(task)
-                            .padding()
-                        Spacer()
+                },
+                             preview: {
+                    ZStack {
+                        HStack {
+                            preview(task)
+                                .padding()
+                            Spacer()
+                        }
+                        .frame(width: UIScreen.main.bounds.width - 32)
+                        .cornerRadius(4)
+                        .background(.appGray)
                     }
-                    .frame(width: UIScreen.main.bounds.width - 32)
-                    .cornerRadius(4)
-                    .background(.appGray)
-                }
-                .background {
-                    LinearGradient(
-                        colors: [.blue, .red],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
+                    .background {
+                        LinearGradient(
+                            colors: [.blue, .red],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                        .ignoresSafeArea()
+                    }
                     .ignoresSafeArea()
-                }
-                .ignoresSafeArea()
-            })
-        }
-        .onChange(of: speechHelper.transcribedText) { newValue in
-            if !newValue.isEmpty {
-                searchInput = newValue
+                })
             }
-        }
-        .onAppear {
-            presenter.loadTasks()
-            speechHelper.requestPermissions { granted in
-                if !granted {
-                    print("Speech or mic permissions not granted")
+            .onChange(of: speechHelper.transcribedText) { newValue in
+                if !newValue.isEmpty {
+                    searchInput = newValue
                 }
             }
-        }
-        .navigationTitle("Задачи")
+            .onAppear {
+                presenter.loadTasks()
+                speechHelper.requestPermissions { granted in
+                    if !granted {
+                        print("Speech or mic permissions not granted")
+                    }
+                }
+            }
+            .navigationTitle("Задачи")
     }
     
     fileprivate func bottomView() -> some View {
