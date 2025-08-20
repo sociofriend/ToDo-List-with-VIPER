@@ -23,40 +23,48 @@ protocol TaskListPresenterProtocol: ObservableObject {
 
 final class TaskListPresenter<Task, TaskModel, Response>: ObservableObject, TaskListPresenterProtocol where Task: TodoProtocol, TaskModel: TodoPresentationProtocol, Response: ResponseProtocol {    
     
-
     @Published var tasks: [TaskModel] = []
     var interactor: any TaskListInteractorProtocol
     var router: (any TaskListRouterProtocol)?
-
+    
     init(interactor: any TaskListInteractorProtocol, router: TaskListRouter<Task, TaskModel, Response>? = nil) {
         self.interactor = interactor
     }
+    
 
-    func loadTasks() {
-        interactor.fetchItems()
-    }
+}
 
+// functions for external usage
+// for interactor
+extension TaskListPresenter {
     func didFetchTasks(_ tasks: [TaskModel]) {
         self.tasks = tasks
     }
-    
-    func remove(at id: Int) {
+}
+
+
+
+//crud
+extension TaskListPresenter {
+    // create
+    func addItem(id: Int, title: String, todo: String, completed: Bool, userID: Int, date: Date) {
+        // guard item with given id does not exist in db
+        let newTask = Task(id: Int64(id), title: title, todo: todo, completed: completed, userId: Int64(userID), date: date)
         if let interactor = interactor as? TaskListInteractor<Task, TaskModel, Response> {
-            interactor.removeItem(with: id)
-            tasks.removeAll(where: { $0.id == id})
+            interactor.add(item: newTask)
         }
     }
 
+    //read
+    func loadTasks() {
+        interactor.fetchItems()
+    }
+    
+    //update
     func checkboxToggled(for id: Int) {
         guard let index = tasks.firstIndex(where: { $0.id == id }) else { return }
         var task = tasks[index]
         task.completed.toggle()
-        tasks[index] = task
-        update(Task(task))
-    }
-    
-    func update(_ task: TaskModel) {
-        guard let index = tasks.firstIndex(where: { $0.id == task.id }) else { return }
         tasks[index] = task
         update(Task(task))
     }
@@ -67,11 +75,18 @@ final class TaskListPresenter<Task, TaskModel, Response>: ObservableObject, Task
         }
     }
     
-    func addItem(id: Int, title: String, todo: String, completed: Bool, userID: Int, date: Date) {
-        // guard item with given id does not exist in db
-        let newTask = Task(id: Int64(id), title: title, todo: todo, completed: completed, userId: Int64(userID), date: date)
+    private func update(_ task: TaskModel) {
+        guard let index = tasks.firstIndex(where: { $0.id == task.id }) else { return }
+        tasks[index] = task
+        update(Task(task))
+    }
+    
+    //delete
+    func remove(at id: Int) {
         if let interactor = interactor as? TaskListInteractor<Task, TaskModel, Response> {
-            interactor.add(item: newTask)
+            interactor.removeItem(with: id)
+            tasks.removeAll(where: { $0.id == id})
         }
     }
 }
+

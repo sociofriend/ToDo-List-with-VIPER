@@ -29,11 +29,10 @@ struct TaskDetailsView: View {
     
     var body: some View {
         VStack(alignment: .leading) {
-            
             TextField("Title..", text: $title)
             .font(.system(size: 34, weight: .bold))
             .multilineTextAlignment(.leading)
-            .padding(.vertical, 4)
+            .padding(.bottom, 4)
             
             Text(dateString)
                 .font(.system(size: 12, weight: .regular))

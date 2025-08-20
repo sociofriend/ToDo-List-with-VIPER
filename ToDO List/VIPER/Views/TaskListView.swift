@@ -26,7 +26,7 @@ struct TaskListView<Task: TodoProtocol, TaskModel: TodoPresentationProtocol, Res
         }
         
         // Sort by id (assuming id is Comparable, e.g. UUID or Int)
-        return base.sorted { $0.id < $1.id }
+        return base.sorted { $0.id > $1.id }
     }    
     
     var body: some View {
@@ -36,6 +36,8 @@ struct TaskListView<Task: TodoProtocol, TaskModel: TodoPresentationProtocol, Res
                 if let taskId = selectedTaskId {
                     if let task = presenter.tasks.first(where: { $0.id == taskId }) {
                         TaskDetailsView(title: task.title, todo: task.todo, date: task.date) { title, todo in
+                            selectedTaskId = nil
+                            
                             presenter.update(
                                 Task(
                                     id: Int64(task.id), 
@@ -44,7 +46,7 @@ struct TaskListView<Task: TodoProtocol, TaskModel: TodoPresentationProtocol, Res
                                     completed: task.completed, 
                                     userId: Int64(task.userId), 
                                     date: Date()))
-                            selectedTaskId = nil
+              
                         }
                         
                     } else {

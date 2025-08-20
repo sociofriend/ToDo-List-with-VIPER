@@ -15,10 +15,11 @@ protocol TodoPresentationProtocol: Codable, Identifiable, Hashable {
     var userId: Int { get set }
     var date: Date { get set }
     
+    init(id: Int64, title: String?, todo: String, completed: Bool, userId: Int64, date: Date?) 
     init(task: any TodoProtocol)
 }
 
-struct TodoPresentationModel: TodoPresentationProtocol {
+struct TodoPresentationModel: TodoPresentationProtocol {    
     
     var id: Int
     var title: String
@@ -34,6 +35,15 @@ struct TodoPresentationModel: TodoPresentationProtocol {
         self.completed = task.completed
         self.userId = Int(task.userId)
         self.date = task.date ?? Date()
+    }
+    
+    init(id: Int64, title: String?, todo: String, completed: Bool, userId: Int64, date: Date?) {
+        self.id = Int(id)
+        self.title = title ?? ""
+        self.todo = todo
+        self.completed = completed
+        self.userId = Int(userId)
+        self.date = date ?? Date()
     }
 }
 
