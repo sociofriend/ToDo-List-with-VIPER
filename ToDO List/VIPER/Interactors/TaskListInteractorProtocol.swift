@@ -90,7 +90,7 @@ where ToDo: TodoProtocol,
             let entity = ToDoEntity(context: self.context)
             entity.id = item.id
             entity.todo = item.todo
-            entity.title = item.title ?? ""
+            entity.title = item.title
             entity.completed = item.completed
             entity.userId = item.userId
             entity.date = item.date

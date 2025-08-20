@@ -30,11 +30,11 @@ struct TodoPresentationModel: TodoPresentationProtocol {
     
     init(task: any TodoProtocol) {
         self.id = Int(task.id)
-        self.title = task.title ?? ""
+        self.title = task.title
         self.todo = task.todo
         self.completed = task.completed
         self.userId = Int(task.userId)
-        self.date = task.date ?? Date()
+        self.date = task.date
     }
     
     init(id: Int64, title: String?, todo: String, completed: Bool, userId: Int64, date: Date?) {

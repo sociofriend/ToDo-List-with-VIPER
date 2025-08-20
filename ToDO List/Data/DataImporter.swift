@@ -42,11 +42,11 @@ struct DataImporter<Task: TodoProtocol, Response: ResponseProtocol> where Respon
                 
                 // Update fields
                 entity.id = task.id
-                entity.title = task.title ?? ""
+                entity.title = task.title
                 entity.todo = task.todo
                 entity.completed = task.completed
                 entity.userId = task.userId
-                entity.date = task.date ?? Date()
+                entity.date = task.date
             }
         }
         
