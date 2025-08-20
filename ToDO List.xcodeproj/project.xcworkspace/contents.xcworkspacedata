@@ -4,4 +4,7 @@
    <FileRef
       location = "self:">
    </FileRef>
+   <FileRef
+      location = "group:AppIcon_Template.svg">
+   </FileRef>
 </Workspace>
