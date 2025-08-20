@@ -242,11 +242,13 @@ extension TaskListView {
                     .fontWeight(.medium)
             }
             
-            Text(task.todo)
-                .font(.system(size: 12))
-                .strikethrough((task.title.isEmpty == true) && task.completed)
-                .fontWeight(.regular)
-                .frame(maxHeight: 70)
+            if !task.todo.isEmpty {
+                Text(task.todo)
+                    .font(.system(size: 12))
+                    .strikethrough((task.title.isEmpty == true) && task.completed)
+                    .fontWeight(.regular)
+                    .frame(maxHeight: 70)
+            }
             
 
             Text((task.date).formatted(date: .numeric, time: .omitted))
