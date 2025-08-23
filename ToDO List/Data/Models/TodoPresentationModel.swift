@@ -7,7 +7,7 @@
 
 import Foundation
 
-protocol TodoPresentationProtocol: Codable, Identifiable, Hashable {
+protocol TodoPresentationProtocol: Identifiable, Hashable {
     var id: Int { get set}
     var title: String { get set }
     var todo: String { get set }
@@ -55,4 +55,3 @@ struct TodoPresentationModel: TodoPresentationProtocol {
         return titleToSend + bodyToSend + dateToSend
     }
 }
-

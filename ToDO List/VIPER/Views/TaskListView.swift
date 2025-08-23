@@ -17,18 +17,6 @@ struct TaskListView<Task: TodoProtocol, TaskModel: TodoPresentationProtocol, Res
     
     @State var selectedTaskId: Int? = nil
     
-    var filteredTasks: [TaskModel] {
-        let base = searchInput.isEmpty
-        ? presenter.tasks
-        : presenter.tasks.filter {
-            ($0.title.localizedCaseInsensitiveContains(searchInput)) ||
-            $0.todo.localizedCaseInsensitiveContains(searchInput)
-        }
-        
-        // Sort by id (assuming id is Comparable, e.g. UUID or Int)
-        return base.sorted { $0.id > $1.id }
-    }    
-    
     var body: some View {
         NavigationView {
             VStack(spacing: 0) {
@@ -40,14 +28,13 @@ struct TaskListView<Task: TodoProtocol, TaskModel: TodoPresentationProtocol, Res
                             
                             guard !title.isEmpty || !todo.isEmpty else { return }
                             
-                            presenter.update(
-                                Task(
-                                    id: Int64(task.id), 
-                                    title: title, 
-                                    todo: todo, 
-                                    completed: task.completed, 
-                                    userId: Int64(task.userId), 
-                                    date: Date()))
+                            presenter.addOrUpdateItem(
+                                id: task.id,
+                                title: title,
+                                todo: todo,
+                                completed: task.completed,
+                                userID: task.userId,
+                                date: Date())
                         }
                         
                     } else {
@@ -55,19 +42,19 @@ struct TaskListView<Task: TodoProtocol, TaskModel: TodoPresentationProtocol, Res
                         NewTaskDetailsView() { title, todo in
                             self.selectedTaskId = nil
                             guard !title.isEmpty || !todo.isEmpty else { return }
-                            presenter.addItem(
-                                id: presenter.tasks.count + 1, 
-                                title: title, 
-                                todo: todo, 
-                                completed: false, 
-                                userID: presenter.tasks.count > 0 ? presenter.tasks[0].userId : 1, 
+                            presenter.addOrUpdateItem(
+                                id: nil,
+                                title: title,
+                                todo: todo,
+                                completed: false,
+                                userID: presenter.tasks.first?.userId ?? 1,
                                 date: Date())
                         }
                     }
                 } else {
                     searchView()
                     
-                    if !filteredTasks.isEmpty {
+                    if !presenter.filteredTasks(searchText: searchInput).isEmpty {
                         listView()
                     } else {
                         VStack {
@@ -81,9 +68,8 @@ struct TaskListView<Task: TodoProtocol, TaskModel: TodoPresentationProtocol, Res
                     bottomView()
                 }
             }
-
-        }        
-    }    
+        }
+    }
 }
 
 
@@ -118,88 +104,88 @@ extension TaskListView {
     
     @ViewBuilder
     fileprivate func listView() -> some View {
+        let filteredTasks = presenter.filteredTasks(searchText: searchInput)
         
-            List(filteredTasks, id: \.id) { task in
-                HStack(alignment: .center) {
-                    Image(systemName: (task.completed ? "checkmark.circle" : "circle" ))
-                        .resizable()
-                        .foregroundStyle(task.completed ? .accent : .appWhite)
-                        .frame(width: 24, height: 24)
-                        .onTapGesture {
-                            // change completed in core data
-                            presenter.checkboxToggled(for: task.id)
-                        }
-                    
-                    preview(task)
-                }
-                .onTapGesture {
-                    selectedTaskId = task.id
-                }
-                .listRowBackground(Color(.systemBackground))
-                .contextMenu(menuItems: {
-                    VStack {
-                        Button {
-                            selectedTaskId = task.id
-                        } label: {
-                            HStack {
-                                Text("Редактировать")
-                                Spacer()
-                                Image(systemName: "square.and.pencil")
-                            }
-                        }
-                        
-                        ShareLink(item: task.toSend()) {
-                            Label("Поделиться", systemImage: "square.and.arrow.up")
-                        }
-                        
-                        Button {
-                            presenter.remove(at: Int(task.id))
-                        } label: {
-                            HStack {
-                                Text("Удалить")
-                                Spacer()
-                                Image(systemName: "trash")
-                            }
-                            .foregroundStyle(.red)
-                        }
+        List(filteredTasks, id: \.id) { task in
+            HStack(alignment: .center) {
+                Image(systemName: (task.completed ? "checkmark.circle" : "circle" ))
+                    .resizable()
+                    .foregroundStyle(task.completed ? .accent : .appWhite)
+                    .frame(width: 24, height: 24)
+                    .onTapGesture {
+                        presenter.checkboxToggled(for: task.id)
                     }
-                },
-                             preview: {
-                    ZStack {
+                
+                preview(task)
+            }
+            .onTapGesture {
+                selectedTaskId = task.id
+            }
+            .listRowBackground(Color(.systemBackground))
+            .contextMenu(menuItems: {
+                VStack {
+                    Button {
+                        selectedTaskId = task.id
+                    } label: {
                         HStack {
-                            preview(task)
-                                .padding()
+                            Text("Редактировать")
                             Spacer()
+                            Image(systemName: "square.and.pencil")
                         }
-                        .frame(width: UIScreen.main.bounds.width - 32)
-                        .cornerRadius(4)
-                        .background(.appGray)
                     }
-                    .background {
-                        LinearGradient(
-                            colors: [.blue, .red],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                        .ignoresSafeArea()
+                    
+                    ShareLink(item: task.toSend()) {
+                        Label("Поделиться", systemImage: "square.and.arrow.up")
                     }
+                    
+                    Button {
+                        presenter.remove(at: Int(task.id))
+                    } label: {
+                        HStack {
+                            Text("Удалить")
+                            Spacer()
+                            Image(systemName: "trash")
+                        }
+                        .foregroundStyle(.red)
+                    }
+                }
+            },
+                         preview: {
+                ZStack {
+                    HStack {
+                        preview(task)
+                            .padding()
+                        Spacer()
+                    }
+                    .frame(width: UIScreen.main.bounds.width - 32)
+                    .cornerRadius(4)
+                    .background(.appGray)
+                }
+                .background {
+                    LinearGradient(
+                        colors: [.blue, .red],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
                     .ignoresSafeArea()
-                })
+                }
+                .ignoresSafeArea()
+            })
+        }
+        .onChange(of: speechHelper.transcribedText) { newValue in
+            if !newValue.isEmpty {
+                searchInput = newValue
             }
-            .onChange(of: speechHelper.transcribedText) { newValue in
-                if !newValue.isEmpty {
-                    searchInput = newValue
+        }
+        .onAppear {
+            presenter.loadTasks()
+            speechHelper.requestPermissions { granted in
+                if !granted {
+                    print("Speech or mic permissions not granted")
                 }
             }
-            .onAppear {
-                presenter.loadTasks()
-                speechHelper.requestPermissions { granted in
-                    if !granted {
-                        print("Speech or mic permissions not granted")
-                    }
-                }
-            }
-            .navigationTitle("Задачи")
+        }
+        .navigationTitle("Задачи")
     }
     
     fileprivate func bottomView() -> some View {
@@ -256,11 +242,6 @@ extension TaskListView {
                 .foregroundColor(.secondary)
         }
         .foregroundStyle(.appWhite.opacity(!task.completed ? 1 : 0.5))
-        .onChange(of: presenter.tasks) { oldValue in
-            print("\n- - - - - - ")
-            print(oldValue)
-            print("- - - - - - \n")
-        }
     }
     
 }

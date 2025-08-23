@@ -11,7 +11,7 @@ import AVFoundation
 import SwiftUI
 import Combine
 
-class SpeechRecognizerHelper: NSObject, ObservableObject {
+final class SpeechRecognizerHelper: NSObject, ObservableObject {
     private let recognizer = SFSpeechRecognizer(locale: Locale(identifier: "en-US"))
     private var request: SFSpeechAudioBufferRecognitionRequest?
     private var recognitionTask: SFSpeechRecognitionTask?

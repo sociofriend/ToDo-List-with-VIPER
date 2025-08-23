@@ -9,7 +9,7 @@
 import Foundation
 
 
-protocol ResponseProtocol: Codable {
+protocol ResponseProtocol: Decodable {
     associatedtype Task: TodoProtocol
     var todos: [Task] { get set }
     var total: Int { get set }

@@ -160,4 +160,3 @@ where ToDo: TodoProtocol,
         }
     }
 }
-

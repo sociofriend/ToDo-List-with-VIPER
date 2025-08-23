@@ -15,13 +15,12 @@ protocol TaskListPresenterProtocol: ObservableObject {
     func loadTasks()
     func didFetchTasks(_ tasks: [TaskModel])
     func checkboxToggled(for id: Int)
-    func update(_ task: Task) 
+    func update(_ task: Task)
     func addItem(id: Int, title: String, todo: String, completed: Bool, userID: Int, date: Date)
     func remove(at id: Int)
 }
 
-
-final class TaskListPresenter<Task, TaskModel, Response>: ObservableObject, TaskListPresenterProtocol where Task: TodoProtocol, TaskModel: TodoPresentationProtocol, Response: ResponseProtocol {    
+final class TaskListPresenter<Task, TaskModel, Response>: ObservableObject, TaskListPresenterProtocol where Task: TodoProtocol, TaskModel: TodoPresentationProtocol, Response: ResponseProtocol {
     
     @Published var tasks: [TaskModel] = []
     var interactor: any TaskListInteractorProtocol
@@ -31,7 +30,32 @@ final class TaskListPresenter<Task, TaskModel, Response>: ObservableObject, Task
         self.interactor = interactor
     }
     
-
+    // Computed property for filtered and sorted tasks based on search text
+    func filteredTasks(searchText: String) -> [TaskModel] {
+        let filtered = searchText.isEmpty ? tasks : tasks.filter { task in
+            task.title.lowercased().contains(searchText.lowercased()) ||
+            task.todo.lowercased().contains(searchText.lowercased())
+        }
+        return filtered.sorted { $0.date > $1.date }
+    }
+    
+    // Add or update task based on optional ID (for edit or create)
+    func addOrUpdateItem(id: Int?, title: String, todo: String, completed: Bool, userID: Int, date: Date) {
+        if let id = id, let index = tasks.firstIndex(where: { $0.id == id }) {
+            // Update existing
+            var taskModel = tasks[index]
+            taskModel.title = title
+            taskModel.todo = todo
+            taskModel.completed = completed
+            taskModel.userId = userID
+            taskModel.date = date
+            tasks[index] = taskModel
+            update(Task(taskModel))
+        } else {
+            // Add new
+            addItem(id: id ?? 0, title: title, todo: todo, completed: completed, userID: userID, date: date)
+        }
+    }
 }
 
 // functions for external usage
@@ -41,8 +65,6 @@ extension TaskListPresenter {
         self.tasks = tasks
     }
 }
-
-
 
 //crud
 extension TaskListPresenter {
@@ -54,7 +76,7 @@ extension TaskListPresenter {
             interactor.add(item: newTask)
         }
     }
-
+    
     //read
     func loadTasks() {
         interactor.fetchItems()
@@ -89,4 +111,3 @@ extension TaskListPresenter {
         }
     }
 }
-
