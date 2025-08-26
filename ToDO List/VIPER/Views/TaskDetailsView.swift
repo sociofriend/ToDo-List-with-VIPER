@@ -34,6 +34,7 @@ struct TaskDetailsView: View {
                 .foregroundStyle(.accent)
             }
         }
+        .navigationTitle("Edit")
         .navigationBarTitleDisplayMode(.inline)
     }
 }

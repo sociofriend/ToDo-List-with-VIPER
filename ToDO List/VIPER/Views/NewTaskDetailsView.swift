@@ -28,6 +28,7 @@ struct NewTaskDetailsView: View {
                         onSave(title, todo)
                     }
                 }
+                .foregroundStyle(.accent)
             }
         }
     }

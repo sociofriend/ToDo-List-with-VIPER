@@ -54,6 +54,7 @@ struct TaskListView<Task: TodoProtocol, TaskModel: TodoPresentationProtocol, Res
                 } else {
                     searchView()
                     
+                    // TODO: add no task case
                     if !presenter.filteredTasks(searchText: presenter.searchInput).isEmpty {
                         listView()
                     } else {
@@ -216,12 +217,12 @@ extension TaskListView {
     private func preview(_ task: TaskModel) -> some View {
         VStack(alignment: .leading, spacing: 4) {
             
-//            if !task.title.isEmpty {
-                Text("\(task.id) - \(task.title)") 
+            if !task.title.isEmpty {
+                Text(task.title) 
                     .font(.system(size: 16))
                     .strikethrough(task.completed)
                     .fontWeight(.medium)
-//            }
+            }
             
             if !task.todo.isEmpty {
                 Text(task.todo)
