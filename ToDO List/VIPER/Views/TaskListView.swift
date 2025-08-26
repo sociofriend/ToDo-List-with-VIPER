@@ -5,7 +5,6 @@
 //  Created by Lilit Avdalyan on 15.08.25.
 //
 
-
 import SwiftUI
 import Speech
 
@@ -13,34 +12,35 @@ struct TaskListView<Task: TodoProtocol, TaskModel: TodoPresentationProtocol, Res
     
     @ObservedObject var presenter: TaskListPresenter<Task, TaskModel, Response>
     @StateObject private var speechHelper = SpeechRecognizerHelper()
-    @State private var searchInput: String = ""
-    
-    @State var selectedTaskId: Int? = nil
     
     var body: some View {
         NavigationView {
-            VStack(spacing: 0) {
-                
-                if let taskId = selectedTaskId {
+            VStack(spacing: 0) {   
+                if let taskId = presenter.selectedTaskId {
                     if let task = presenter.tasks.first(where: { $0.id == taskId }) {
-                        TaskDetailsView(title: task.title, todo: task.todo, date: task.date) { title, todo in
-                            selectedTaskId = nil
-                            
-                            guard !title.isEmpty || !todo.isEmpty else { return }
-                            
-                            presenter.addOrUpdateItem(
-                                id: task.id,
-                                title: title,
-                                todo: todo,
-                                completed: task.completed,
-                                userID: task.userId,
-                                date: Date())
-                        }
+                        let detailsPresenter = TaskDetailsPresenter(
+                            title: task.title,
+                            todo: task.todo,
+                            date: task.date,
+                            interactor: TaskDetailsInteractor(),
+                            router: TaskDetailsRouter(),
+                            onDismiss: { title, todo in
+                                presenter.selectedTaskId = nil
+                                guard !title.isEmpty || !todo.isEmpty else { return }
+                                presenter.addOrUpdateItem(
+                                    id: task.id,
+                                    title: title,
+                                    todo: todo,
+                                    completed: task.completed,
+                                    userID: task.userId,
+                                    date: Date())
+                            })
+                        TaskDetailsView(presenter: detailsPresenter)
                         
                     } else {
                         
                         NewTaskDetailsView() { title, todo in
-                            self.selectedTaskId = nil
+                            presenter.selectedTaskId = nil
                             guard !title.isEmpty || !todo.isEmpty else { return }
                             presenter.addOrUpdateItem(
                                 id: nil,
@@ -54,7 +54,7 @@ struct TaskListView<Task: TodoProtocol, TaskModel: TodoPresentationProtocol, Res
                 } else {
                     searchView()
                     
-                    if !presenter.filteredTasks(searchText: searchInput).isEmpty {
+                    if !presenter.filteredTasks(searchText: presenter.searchInput).isEmpty {
                         listView()
                     } else {
                         VStack {
@@ -79,7 +79,7 @@ extension TaskListView {
     @ViewBuilder
     fileprivate func searchView() -> some View {
         HStack {
-            TextField("Search", text: $searchInput)
+            TextField("Search", text: $presenter.searchInput)
                 .padding(8)
                 .padding(.leading, 30)
                 .background(Color(.systemGray6))
@@ -104,77 +104,75 @@ extension TaskListView {
     
     @ViewBuilder
     fileprivate func listView() -> some View {
-        let filteredTasks = presenter.filteredTasks(searchText: searchInput)
         
-        List(filteredTasks, id: \.id) { task in
-            HStack(alignment: .center) {
-                Image(systemName: (task.completed ? "checkmark.circle" : "circle" ))
-                    .resizable()
-                    .foregroundStyle(task.completed ? .accent : .appWhite)
-                    .frame(width: 24, height: 24)
-                    .onTapGesture {
-                        presenter.checkboxToggled(for: task.id)
-                    }
-                
-                preview(task)
-            }
-            .onTapGesture {
-                selectedTaskId = task.id
-            }
-            .listRowBackground(Color(.systemBackground))
-            .contextMenu(menuItems: {
-                VStack {
-                    Button {
-                        selectedTaskId = task.id
-                    } label: {
-                        HStack {
-                            Text("Редактировать")
-                            Spacer()
-                            Image(systemName: "square.and.pencil")
+        List {
+            ForEach(presenter.filteredTasks, id: \.id) { task in
+                HStack(alignment: .center) {
+                    Image(systemName: (task.completed ? "checkmark.circle" : "circle" ))
+                        .resizable()
+                        .foregroundStyle(task.completed ? .accent : .appWhite)
+                        .frame(width: 24, height: 24)
+                        .onTapGesture {
+                            presenter.checkboxToggled(for: task.id)
+                        }
+                    preview(task)
+                }
+                .onTapGesture {
+                    presenter.selectedTaskId = task.id
+                }
+                .listRowBackground(Color(.systemBackground))
+                .contextMenu(menuItems: {
+                    VStack {
+                        Button {
+                            presenter.selectedTaskId = task.id
+                        } label: {
+                            HStack {
+                                Text("Edit")
+                                Spacer()
+                                Image(systemName: "square.and.pencil")
+                            }
+                        }
+                        ShareLink(item: task.toSend()) {
+                            Label("Share", systemImage: "square.and.arrow.up")
+                        }
+                        Button {
+                            presenter.remove(at: Int(task.id))
+                        } label: {
+                            HStack {
+                                Text("Delete")
+                                Spacer()
+                                Image(systemName: "trash")
+                            }
+                            .foregroundStyle(.red)
                         }
                     }
-                    
-                    ShareLink(item: task.toSend()) {
-                        Label("Поделиться", systemImage: "square.and.arrow.up")
-                    }
-                    
-                    Button {
-                        presenter.remove(at: Int(task.id))
-                    } label: {
+                }, preview: {
+                    ZStack {
                         HStack {
-                            Text("Удалить")
+                            preview(task)
+                                .padding()
                             Spacer()
-                            Image(systemName: "trash")
                         }
-                        .foregroundStyle(.red)
+                        .frame(width: UIScreen.main.bounds.width - 32)
+                        .cornerRadius(4)
+                        .background(.appGray)
                     }
-                }
-            },
-                         preview: {
-                ZStack {
-                    HStack {
-                        preview(task)
-                            .padding()
-                        Spacer()
+                    .background {
+                        LinearGradient(
+                            colors: [.blue, .red],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                        .ignoresSafeArea()
                     }
-                    .frame(width: UIScreen.main.bounds.width - 32)
-                    .cornerRadius(4)
-                    .background(.appGray)
-                }
-                .background {
-                    LinearGradient(
-                        colors: [.blue, .red],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
                     .ignoresSafeArea()
-                }
-                .ignoresSafeArea()
-            })
+                })
+            }
+            .onDelete(perform: deleteTask)
         }
         .onChange(of: speechHelper.transcribedText) { newValue in
             if !newValue.isEmpty {
-                searchInput = newValue
+                presenter.searchInput = newValue
             }
         }
         .onAppear {
@@ -185,24 +183,21 @@ extension TaskListView {
                 }
             }
         }
-        .navigationTitle("Задачи")
+        .navigationTitle("Tasks")
+        .navigationBarTitleDisplayMode(.inline)
     }
     
     fileprivate func bottomView() -> some View {
         return ZStack {
             
-            Text(String("\(presenter.tasks.count) задач"))
+            Text(String("\(presenter.tasks.count) tasks"))
                 .frame(width: UIScreen.main.bounds.width / 3)
                 .multilineTextAlignment(.center)
             
             HStack {
                 Spacer()
                 Button {
-                    if !presenter.tasks.isEmpty {
-                        selectedTaskId = presenter.tasks.count + 1
-                    } else {
-                        selectedTaskId = 1
-                    }
+                    presenter.selectedTaskId = presenter.tasks.count + 1
                 } label: {
                     Image(systemName: "square.and.pencil")
                         .resizable()
@@ -212,7 +207,7 @@ extension TaskListView {
             }
         }
         .ignoresSafeArea()
-        .frame(height: 49)
+        .frame(height: 48)
         .padding(.horizontal)
         .background(.appGray)
     }
@@ -221,19 +216,19 @@ extension TaskListView {
     private func preview(_ task: TaskModel) -> some View {
         VStack(alignment: .leading, spacing: 4) {
             
-            if !task.title.isEmpty {
-                Text(task.title)
+//            if !task.title.isEmpty {
+                Text("\(task.id) - \(task.title)") 
                     .font(.system(size: 16))
                     .strikethrough(task.completed)
                     .fontWeight(.medium)
-            }
+//            }
             
             if !task.todo.isEmpty {
                 Text(task.todo)
                     .font(.system(size: 12))
                     .strikethrough((task.title.isEmpty == true) && task.completed)
                     .fontWeight(.regular)
-                    .frame(maxHeight: 70)
+                    .frame(maxHeight: 16)
             }
             
 
@@ -256,6 +251,13 @@ extension TaskListView {
             speechHelper.startRecording()
         }
     }
+    
+    private func deleteTask(at offsets: IndexSet) {
+        let filteredTasks = presenter.filteredTasks(searchText: presenter.searchInput)
+        for index in offsets {
+            presenter.remove(at: Int(filteredTasks[index].id))
+        }
+    }
 }
 
 internal import CoreData
@@ -265,4 +267,3 @@ internal import CoreData
         .colorScheme(.dark)
         .environment(\.managedObjectContext, persistenceController.container.viewContext)
 }
-

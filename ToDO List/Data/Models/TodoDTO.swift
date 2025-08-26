@@ -29,7 +29,26 @@ struct TodoDTO: TodoProtocol {
     var userId: Int64
     var date: Date
     
-    init(id: Int64, title: String? = nil, todo: String, completed: Bool, userId: Int64, date: Date? = nil) {
+    enum CodingKeys: String, CodingKey {
+        case id
+        case title
+        case todo
+        case completed
+        case userId
+        case date
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(Int64.self, forKey: .id)
+        title = try container.decodeIfPresent(String.self, forKey: .title) ?? ""
+        todo = try container.decode(String.self, forKey: .todo)
+        completed = try container.decode(Bool.self, forKey: .completed)
+        userId = try container.decode(Int64.self, forKey: .userId)
+        date = try container.decodeIfPresent(Date.self, forKey: .date) ?? Date()
+    }
+    
+    init(id: Int64, title: String? , todo: String, completed: Bool, userId: Int64, date: Date? = nil) {
         self.id = id
         self.title = title ?? ""
         self.todo = todo

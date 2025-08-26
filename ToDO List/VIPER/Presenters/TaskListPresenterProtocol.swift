@@ -8,23 +8,24 @@
 import SwiftUI
 import Combine
 
-protocol TaskListPresenterProtocol: ObservableObject {
-    associatedtype Task where Task: TodoProtocol
-    associatedtype TaskModel where TaskModel: TodoPresentationProtocol
-    var tasks: [TaskModel] { get set }
-    func loadTasks()
-    func didFetchTasks(_ tasks: [TaskModel])
-    func checkboxToggled(for id: Int)
-    func update(_ task: Task)
-    func addItem(id: Int, title: String, todo: String, completed: Bool, userID: Int, date: Date)
-    func remove(at id: Int)
-}
-
-final class TaskListPresenter<Task, TaskModel, Response>: ObservableObject, TaskListPresenterProtocol where Task: TodoProtocol, TaskModel: TodoPresentationProtocol, Response: ResponseProtocol {
+final class TaskListPresenter<Task, TaskModel, Response>: ObservableObject where Task: TodoProtocol, TaskModel: TodoPresentationProtocol, Response: ResponseProtocol {
     
-    @Published var tasks: [TaskModel] = []
+    @Published var tasks: [TaskModel] = [] {
+        didSet {
+            filteredTasks = filteredTasks(searchText: searchInput)
+        }
+    }
+    
     var interactor: any TaskListInteractorProtocol
     var router: (any TaskListRouterProtocol)?
+    @Published var searchInput: String = "" {
+        didSet {
+            filteredTasks = filteredTasks(searchText: searchInput)
+        }
+    }
+    @Published var selectedTaskId: Int? = nil
+    
+    @Published var filteredTasks: [TaskModel] = []
     
     init(interactor: any TaskListInteractorProtocol, router: TaskListRouter<Task, TaskModel, Response>? = nil) {
         self.interactor = interactor
@@ -36,25 +37,33 @@ final class TaskListPresenter<Task, TaskModel, Response>: ObservableObject, Task
             task.title.lowercased().contains(searchText.lowercased()) ||
             task.todo.lowercased().contains(searchText.lowercased())
         }
-        return filtered.sorted { $0.date > $1.date }
+        return filtered.sorted { $0.id > $1.id }
     }
     
     // Add or update task based on optional ID (for edit or create)
     func addOrUpdateItem(id: Int?, title: String, todo: String, completed: Bool, userID: Int, date: Date) {
         if let id = id, let index = tasks.firstIndex(where: { $0.id == id }) {
-            // Update existing
-            var taskModel = tasks[index]
-            taskModel.title = title
-            taskModel.todo = todo
-            taskModel.completed = completed
-            taskModel.userId = userID
-            taskModel.date = date
-            tasks[index] = taskModel
-            update(Task(taskModel))
+            if shouldUpdateTask(&tasks[index], title: title, todo: todo, completed: completed, userID: userID, date: date) {
+                update(tasks[index])
+            }
         } else {
-            // Add new
-            addItem(id: id ?? 0, title: title, todo: todo, completed: completed, userID: userID, date: date)
+            // Given that id is of Int type
+            addItem(id: tasks.count + 1, title: title, todo: todo, completed: completed, userID: userID, date: date)
         }
+    }
+    
+    private func shouldUpdateTask(_ task: inout TaskModel, title: String, todo: String, completed: Bool, userID: Int, date: Date) -> Bool {
+        let originalTask = task
+        task.title = title
+        task.todo = todo
+        task.completed = completed
+        task.userId = userID
+        task.date = date
+        // Only update if something besides id and date has changed
+        return originalTask.title != task.title ||
+               originalTask.todo != task.todo ||
+               originalTask.completed != task.completed ||
+               originalTask.userId != task.userId
     }
 }
 
@@ -111,3 +120,4 @@ extension TaskListPresenter {
         }
     }
 }
+
