@@ -198,7 +198,7 @@ extension TaskListView {
             HStack {
                 Spacer()
                 Button {
-                    presenter.selectedTaskId = presenter.tasks.count + 1
+                    presenter.selectedTaskId = presenter.newId
                 } label: {
                     Image(systemName: "square.and.pencil")
                         .resizable()

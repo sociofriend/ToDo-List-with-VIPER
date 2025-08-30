@@ -8,13 +8,17 @@ struct NewTaskDetailsView: View {
     var body: some View {
         VStack(alignment: .leading) {
             TextField("Title", text: $title)
+                .font(.largeTitle)
             
             Text("Date: \(Date(), format: Date.FormatStyle().day().month().year())")
                 .padding(.top)
                 .foregroundStyle(.appWhite.opacity(0.5))
             
             TextEditor(text: $todo)
-            
+                .menuIndicator(.visible)
+                .tint(.accentColor)
+                .border(Color(.systemGray4), width: 1)
+                
             Spacer()
         }
         .padding()
@@ -22,13 +26,9 @@ struct NewTaskDetailsView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
-                HStack {
-                    Image(systemName: "chevron.left")
-                    Button("Back") {
-                        onSave(title, todo)
-                    }
+                BackButton {
+                    onSave(title, todo)
                 }
-                .foregroundStyle(.accent)
             }
         }
     }

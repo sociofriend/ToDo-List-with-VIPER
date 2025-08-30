@@ -25,11 +25,11 @@ struct TaskDetailsView: View {
         .padding()
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
-                HStack {
+                Button {
+                    presenter.onDismiss(presenter.title, presenter.todo)
+                } label: {
                     Image(systemName: "chevron.left")
-                    Button("Back") {
-                        presenter.onDismiss(presenter.title, presenter.todo)
-                    }
+                    Text("Back")
                 }
                 .foregroundStyle(.accent)
             }

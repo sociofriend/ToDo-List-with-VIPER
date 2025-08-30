@@ -27,6 +27,11 @@ final class TaskListPresenter<Task, TaskModel, Response>: ObservableObject where
     
     @Published var filteredTasks: [TaskModel] = []
     
+    /// Returns a new unique id, one greater than the current highest task id (or 1 if none exist)
+    var newId: Int {
+        (tasks.map { $0.id }.max() ?? 0) + 1
+    }
+    
     init(interactor: any TaskListInteractorProtocol, router: TaskListRouter<Task, TaskModel, Response>? = nil) {
         self.interactor = interactor
     }

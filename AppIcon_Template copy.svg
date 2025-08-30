@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg-gradient" x1="0" y1="0" x2="0" y2="1024" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#1A2440"/>
+      <stop offset="100%" stop-color="#372992"/>
+    </linearGradient>
+  </defs>
+  <rect x="0" y="0" width="1024" height="1024" rx="0" fill="url(#bg-gradient)"/>
+  <path d="M340 540L470 670L700 420" stroke="#00FFF0" stroke-width="80" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
